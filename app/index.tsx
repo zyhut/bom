@@ -3,6 +3,10 @@ import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { Link } from 'expo-router';
 
+if (typeof window === 'undefined') {
+    React.useLayoutEffect = React.useEffect;
+  }  
+
 export default function Home() {
   return (
     <View style={styles.container}>

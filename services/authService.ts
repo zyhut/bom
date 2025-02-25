@@ -1,17 +1,15 @@
-// services/authService.js
+// services/authService.ts
 import { auth } from './firebaseConfig';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
-  FacebookAuthProvider,
-  TwitterAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 
-// Email/Password Authentication
-export const signUp = async (email, password) => {
+// 🔐 Email/Password Authentication
+export const signUp = async (email: string, password: string) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return userCredential.user;
@@ -21,7 +19,7 @@ export const signUp = async (email, password) => {
   }
 };
 
-export const logIn = async (email, password) => {
+export const logIn = async (email: string, password: string) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
@@ -39,17 +37,14 @@ export const logOut = async () => {
   }
 };
 
-// Social Media Authentication
-const signInWithProvider = async (provider) => {
+// 🔗 Google Sign-In
+export const signInWithGoogle = async () => {
   try {
+    const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
-    console.error('Social Sign-In Error:', error);
+    console.error('Google Sign-In Error:', error);
     throw error;
   }
 };
-
-export const signInWithGoogle = () => signInWithProvider(new GoogleAuthProvider());
-export const signInWithFacebook = () => signInWithProvider(new FacebookAuthProvider());
-export const signInWithTwitter = () => signInWithProvider(new TwitterAuthProvider());
