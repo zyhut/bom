@@ -1,4 +1,5 @@
 // app/auth/login.tsx
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
@@ -6,7 +7,7 @@ import InputField from '../../components/InputField';
 import CustomButton from '../../components/CustomButton';
 import { logIn, signInWithGoogle } from '../../services/authService';
 import { Snackbar } from 'react-native-paper';
-import useIsomorphicLayoutEffect from '../../utils/useIsomorphicLayoutEffect';
+import { useStore } from '../../store/useStore';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -14,16 +15,18 @@ export default function Login() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const router = useRouter();
+  const setUser = useStore((state) => state.setUser);
 
   const handleLogIn = async () => {
     try {
-      await logIn(email, password);
+      const user = await logIn(email, password);
+      setUser(user); // Update Zustand store with the logged-in user
       setSnackbarMessage('Logged in successfully!');
       setSnackbarVisible(true);
 
       // Delay navigation to ensure the Snackbar is visible
       setTimeout(() => {
-        router.push('/'); // Navigate to home screen
+        router.push('/'); // Navigate to the home screen
       }, 1000);
     } catch (error: any) {
       setSnackbarMessage(error.message);
@@ -33,23 +36,20 @@ export default function Login() {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      const user = await signInWithGoogle();
+      setUser(user); // Update Zustand store with the logged-in user
       setSnackbarMessage('Logged in with Google!');
       setSnackbarVisible(true);
 
+      // Delay navigation to ensure the Snackbar is visible
       setTimeout(() => {
-        router.push('/');
+        router.push('/'); // Navigate to the home screen
       }, 1000);
     } catch (error: any) {
       setSnackbarMessage(error.message);
       setSnackbarVisible(true);
     }
   };
-
-  useIsomorphicLayoutEffect(() => {
-    console.log('Client-side only effect in the Login screen!');
-  }, []);
-  
 
   return (
     <View style={styles.container}>
@@ -80,7 +80,7 @@ export default function Login() {
           onPress: () => setSnackbarVisible(false),
         }}
       >
-        {snackbarMessage}
+        <Text>{String(snackbarMessage ?? '')}</Text>
       </Snackbar>
     </View>
   );

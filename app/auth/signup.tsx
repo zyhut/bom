@@ -1,4 +1,5 @@
 // app/auth/signup.tsx
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
@@ -6,46 +7,52 @@ import InputField from '../../components/InputField';
 import CustomButton from '../../components/CustomButton';
 import { signUp } from '../../services/authService';
 import { Snackbar } from 'react-native-paper';
-import useIsomorphicLayoutEffect from '../../utils/useIsomorphicLayoutEffect'; // ✅ New import
+import { updateProfile } from 'firebase/auth';
+import { useStore } from '../../store/useStore';
 
 export default function SignUp() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const router = useRouter();
+  const setUser = useStore((state) => state.setUser);
 
   const handleSignUp = async () => {
     try {
-      await signUp(email, password);
+      const user = await signUp(email, password);
+
+      // ✅ Update the user's display name in Firebase
+      if (user && name) {
+        await updateProfile(user, { displayName: name });
+      }
+
+      // ✅ Update Zustand state and navigate directly to Home
+      setUser({ ...user, displayName: name });
+
       setSnackbarMessage('Account created successfully!');
       setSnackbarVisible(true);
 
-      // Delay navigation to ensure the Snackbar is visible
       setTimeout(() => {
-        router.push('/auth/login');
+        router.push('/'); // Navigate directly to Home
       }, 1000);
-      
     } catch (error: any) {
       setSnackbarMessage(error.message);
       setSnackbarVisible(true);
     }
   };
 
-  // Example use of useIsomorphicLayoutEffect
-  useIsomorphicLayoutEffect(() => {
-    console.log('Client-side only effect!');
-  }, []);
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
+      <InputField placeholder="Name" value={name} onChangeText={setName} />
       <InputField placeholder="Email" value={email} onChangeText={setEmail} />
-      <InputField 
-        placeholder="Password" 
-        value={password} 
-        onChangeText={setPassword} 
-        secureTextEntry 
+      <InputField
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
       />
       <CustomButton title="Sign Up" onPress={handleSignUp} />
       <Link href="/auth/login">
@@ -61,7 +68,7 @@ export default function SignUp() {
           onPress: () => setSnackbarVisible(false),
         }}
       >
-        {snackbarMessage}
+        <Text>{String(snackbarMessage ?? '')}</Text>
       </Snackbar>
     </View>
   );

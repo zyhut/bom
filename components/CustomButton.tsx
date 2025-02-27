@@ -1,9 +1,10 @@
 // components/CustomButton.tsx
+
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 type CustomButtonProps = {
-  title: string;
+  title: string; 
   onPress: () => void;
   backgroundColor?: string;
   color?: string;
@@ -15,8 +16,13 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   backgroundColor = '#1E3A8A', 
   color = '#FFFFFF' 
 }) => (
-  <TouchableOpacity style={[styles.button, { backgroundColor }]} onPress={onPress}>
-    <Text style={[styles.text, { color }]}>{title}</Text>
+  <TouchableOpacity 
+    style={[styles.button, { backgroundColor }]} 
+    onPress={onPress}
+  >
+    <Text style={[styles.text, { color }]}>
+      {String(title ?? '')}
+    </Text>
   </TouchableOpacity>
 );
 
