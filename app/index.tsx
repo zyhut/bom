@@ -1,23 +1,35 @@
 // app/index.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, ActivityIndicator, FlatList, Button, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store/useStore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
-import SignOutButton from '../components/SignOutButton'; // ✅ Use the new SignOutButton component
+import SignOutButton from '../components/SignOutButton';
 import { Platform } from 'react-native';
+import { GoalProvider, useGoals } from '../store/GoalProvider';
 
 // Fallback for useLayoutEffect during SSR
 if (Platform.OS === 'web') {
   React.useLayoutEffect = React.useEffect;
 }
 
+// ✅ Main Home Component wrapped with GoalProvider
 export default function Home() {
+  return (
+    <GoalProvider>
+      <HomeContent />
+    </GoalProvider>
+  );
+}
+
+// ✅ Home Content with Goals Logic
+function HomeContent() {
   const [appReady, setAppReady] = useState(false);
   const user = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);
+  const { goals, goalsLoading, deleteGoal } = useGoals();
   const router = useRouter();
 
   useEffect(() => {
@@ -35,22 +47,60 @@ export default function Home() {
     }
   }, [appReady, user]);
 
-  if (!appReady) {
+  if (!appReady || goalsLoading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#1E3A8A" />
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading goals...</Text>
       </View>
     );
   }
+
+  const handleCreateGoal = () => {
+    const hasUnpaidGoals = goals.some(goal => goal.paymentStatus === 'pending');
+    if (hasUnpaidGoals) {
+      Alert.alert('Unpaid Goals', 'You need to settle unpaid goals before creating new ones.');
+    } else {
+      router.push('/goal/create');
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.welcome}>
         {`Welcome to BetOnMyself (BOM), ${user?.displayName ?? 'BOMer'}!`}
       </Text>
-      
-      <SignOutButton /> 
+
+      <Button title="Create New Goal" onPress={handleCreateGoal} color="#4CAF50" />
+
+      {goals.length === 0 ? (
+        <Text style={styles.noGoalsText}>No goals yet. Let's set one and start betting on yourself!</Text>
+      ) : (
+        <FlatList
+          data={goals}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.goalContainer}>
+              <Text style={styles.goalTitle}>{item.title}</Text>
+              <Text style={styles.goalStatus}>Status: {item.status}</Text>
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="View Details"
+                  onPress={() => router.push(`/goal/detail/${item.id}`)}
+                  color="#1E90FF"
+                />
+                <Button
+                  title="Delete"
+                  onPress={() => deleteGoal(item.id)}
+                  color="#FF6347"
+                />
+              </View>
+            </View>
+          )}
+        />
+      )}
+
+      <SignOutButton />
     </View>
   );
 }
@@ -61,11 +111,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#87CEEB',
+    padding: 20,
   },
   welcome: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1E3A8A',
     marginBottom: 20,
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#555',
+    marginTop: 10,
+  },
+  noGoalsText: {
+    fontSize: 18,
+    color: '#555',
+    marginVertical: 20,
+  },
+  goalContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 15,
+    marginVertical: 10,
+    borderRadius: 8,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  goalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  goalStatus: {
+    fontSize: 16,
+    color: '#777',
+    marginVertical: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
 });
