@@ -8,28 +8,19 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
 import SignOutButton from '../components/SignOutButton';
 import { Platform } from 'react-native';
-import { GoalProvider, useGoals } from '../store/GoalProvider';
+import { useGoals } from '../store/GoalProvider';
 
 // Fallback for useLayoutEffect during SSR
 if (Platform.OS === 'web') {
   React.useLayoutEffect = React.useEffect;
 }
 
-// ✅ Main Home Component wrapped with GoalProvider
-export default function Home() {
-  return (
-    <GoalProvider>
-      <HomeContent />
-    </GoalProvider>
-  );
-}
-
 // ✅ Home Content with Goals Logic
-function HomeContent() {
+export default function Home() {
   const [appReady, setAppReady] = useState(false);
   const user = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);
-  const { goals, goalsLoading, deleteGoal } = useGoals();
+  const { goals, goalsLoading, deleteGoal } = useGoals(); // Get goals from GoalProvide
   const router = useRouter();
 
   useEffect(() => {
@@ -82,19 +73,17 @@ function HomeContent() {
           renderItem={({ item }) => (
             <View style={styles.goalContainer}>
               <Text style={styles.goalTitle}>{item.title}</Text>
-              <Text style={styles.goalStatus}>Status: {item.status}</Text>
-              <View style={styles.buttonContainer}>
-                <Button
-                  title="View Details"
-                  onPress={() => router.push(`/goal/detail/${item.id}`)}
-                  color="#1E90FF"
-                />
-                <Button
-                  title="Delete"
-                  onPress={() => deleteGoal(item.id)}
-                  color="#FF6347"
-                />
-              </View>
+              <Text>Status: {item.status}</Text>
+              <Button
+                title="View Details"
+                onPress={() => router.push(`/goal/detail/${item.id}`)}
+                color="#1E90FF"
+              />
+              <Button
+                title="Delete"
+                onPress={() => deleteGoal(item.id)}
+                color="#FF6347"
+              />
             </View>
           )}
         />
@@ -145,15 +134,5 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-  },
-  goalStatus: {
-    fontSize: 16,
-    color: '#777',
-    marginVertical: 5,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
   },
 });
