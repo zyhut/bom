@@ -29,7 +29,7 @@ const GoalDetailScreen = () => {
         );
         setProgress(progressPercentage);
 
-        if (shouldAutoFailGoal(foundGoal)) {
+        if (shouldAutoFailGoal(foundGoal) && foundGoal.status !== 'failed') {
           handleAutoFailGoal(foundGoal);
         }
       }
@@ -130,6 +130,14 @@ const GoalDetailScreen = () => {
           <Text style={styles.checkInItem}>✅ {item}</Text>
         )}
       />
+
+      {goal.status === 'failed' && goal.paymentStatus === 'pending' && (
+        <Button 
+          title="Pay Now"
+          onPress={() => router.push({ pathname: '/goal/payment', params: { goalId: goal.id } })}
+          color="#FF4500"
+        />
+      )}
 
       {canDeleteGoal(goal) && (
         <Button title="Delete Goal" onPress={handleDeleteGoal} color="#FF6347" />
