@@ -38,4 +38,7 @@ yarn-error.*
 # firebase config
 firebaseConfig.*
 
+# keys
+keys.ts
+
 app-example

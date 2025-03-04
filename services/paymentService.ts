@@ -1,35 +1,48 @@
-import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
-import { STRIPE_PUBLIC_KEY, STRIPE_BACKEND_URL } from '../services/constants';
+import { useStripe } from '@stripe/stripe-react-native';
+import { STRIPE_BACKEND_URL } from './keys';
 
-export const processPayment = async (amount: number): Promise<boolean> => {
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-
+export const getClientSecret = async (amount: number): Promise<string | null> => {
   try {
-    // Call backend to create a payment intent
-    const response = await fetch(STRIPE_BACKEND_URL, {
+    const response = await fetch(`${STRIPE_BACKEND_URL}/api/create-payment-intent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount }),
     });
 
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    if (!response.ok) {
+      throw new Error(`Server Error: ${response.statusText}`);
+    }
 
-    // Initialize Stripe Payment Sheet
+    const { clientSecret } = await response.json();
+    return clientSecret;
+  } catch (err) {
+    console.error('Error fetching client secret:', err);
+    return null;
+  }
+};
+
+export const processPayment = async (clientSecret: string): Promise<boolean> => {
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  try {
     const { error: initError } = await initPaymentSheet({
-      paymentIntentClientSecret: paymentIntent,
-      customerId: customer,
-      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: clientSecret,
       merchantDisplayName: 'BetOnMyself',
     });
 
-    if (initError) throw new Error(initError.message);
+    if (initError) {
+      console.error('Stripe Init Error:', initError);
+      throw new Error(initError.message);
+    }
 
-    // Show Stripe Payment Sheet
     const { error: paymentError } = await presentPaymentSheet();
 
-    if (paymentError) throw new Error(paymentError.message);
+    if (paymentError) {
+      console.error('Payment Sheet Error:', paymentError);
+      throw new Error(paymentError.message);
+    }
 
-    return true; // Payment successful!
+    return true;
   } catch (err) {
     console.error('Stripe Payment Error:', err);
     return false;

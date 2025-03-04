@@ -1,51 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
-import { useGoals } from '../../store/GoalProvider';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useGoals } from '../../store/GoalProvider';
 import { Goal } from '../../types/Goal';
-import { processPayment } from '../../services/paymentService';
+import { getClientSecret, processPayment } from '../../services/paymentService';
+import { STRIPE_PUBLIC_KEY } from '../../services/keys';
 
 export default function PaymentsScreen() {
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
-  const { goals, updateGoal } = useGoals();
+  const { goals, updateGoal, goalsLoading } = useGoals(); // ✅ Keep goalsLoading
   const router = useRouter();
   
-  const [goal, setGoal] = useState<Goal | null>(null);
-  const [loading, setLoading] = useState(true);
+  const goal = goals.find(g => g.id === goalId);
+  const [paymentLoading, setPaymentLoading] = useState(false); // ✅ Payment loading
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
-    const foundGoal = goals.find(g => g.id === goalId);
-    setGoal(foundGoal || null);
-    setLoading(false);
-  }, [goalId, goals]);
-
-  const handlePayment = async () => {
-    if (!goal) return;
-
-    setLoading(true);
-
-    try {
-      const success = await processPayment(goal.stakeAmount);
-
-      if (success) {
-        await updateGoal(goal.id, { paymentStatus: 'paid' });
-        Alert.alert('Payment Successful', `Your payment of $${goal.stakeAmount} was processed.`);
-        router.replace('/');
-      } else {
-        Alert.alert('Payment Failed', 'Something went wrong. Please try again.');
+    const fetchSecret = async () => {
+      if (goal) {
+        const secret = await getClientSecret(goal.stakeAmount);
+        setClientSecret(secret);
       }
-    } catch (error) {
-      Alert.alert('Payment Error', 'An error occurred during payment.');
-    }
+    };
 
-    setLoading(false);
-  };
+    fetchSecret();
+  }, [goal]);
 
-  if (loading) {
+  if (goalsLoading) {
+    // ✅ Show when goal data is still loading
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#1E3A8A" />
-        <Text>Loading payment details...</Text>
+        <Text style={styles.loadingText}>Loading goal...</Text>
       </View>
     );
   }
@@ -59,14 +46,49 @@ export default function PaymentsScreen() {
     );
   }
 
+  const handlePayment = async () => {
+    if (!clientSecret) {
+      Alert.alert('Payment Error', 'No client secret available. Please try again.');
+      return;
+    }
+
+    setPaymentLoading(true);
+    try {
+      const success = await processPayment(clientSecret);
+      if (success) {
+        await updateGoal(goal.id, { paymentStatus: 'paid' });
+        Alert.alert('Payment Successful', `Your payment of $${goal.stakeAmount} was processed.`);
+        router.replace('/');
+      } else {
+        Alert.alert('Payment Failed', 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Payment Error', 'An error occurred during payment.');
+    }
+    setPaymentLoading(false);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Pay Penalty</Text>
-      <Text style={styles.goalTitle}>{goal.title}</Text>
-      <Text>Amount Due: ${goal.stakeAmount}</Text>
-      <Button title="Pay Now" onPress={handlePayment} color="#4CAF50" />
-      <Button title="Back to Home" onPress={() => router.replace('/')} color="#1E90FF" />
-    </View>
+    <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Pay Penalty</Text>
+        <Text style={styles.goalTitle}>{goal.title}</Text>
+        <Text>Amount Due: ${goal.stakeAmount}</Text>
+
+        {clientSecret === null ? ( // ✅ Show when fetching client secret
+          <ActivityIndicator size="large" color="#1E3A8A" />
+        ) : (
+          <>
+            {paymentLoading ? ( // ✅ Show when processing payment
+              <ActivityIndicator size="large" color="#4CAF50" />
+            ) : (
+              <Button title="Pay Now" onPress={handlePayment} color="#4CAF50" />
+            )}
+            <Button title="Back to Home" onPress={() => router.replace('/')} color="#1E90FF" />
+          </>
+        )}
+      </View>
+    </StripeProvider>
   );
 }
 
@@ -75,4 +97,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#1E3A8A', textAlign: 'center' },
   goalTitle: { fontSize: 20, fontWeight: 'bold', color: '#333', marginBottom: 10 },
   errorText: { fontSize: 18, color: '#FF4500', textAlign: 'center', marginTop: 20 },
+  loadingText: { fontSize: 18, color: '#555', textAlign: 'center', marginTop: 10 },
 });
