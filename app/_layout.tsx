@@ -5,16 +5,20 @@ import { Slot } from 'expo-router';
 import { GoalProvider } from '../store/GoalProvider';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaView, StyleSheet } from 'react-native';
+import { StripeProvider } from "@stripe/stripe-react-native";
+import { STRIPE_PUBLIC_KEY } from "../services/keys";
 
 export default function Layout() {
   return (
-    <PaperProvider>
-      <GoalProvider>
-        <SafeAreaView style={styles.container}>
-          <Slot />
-        </SafeAreaView>
-      </GoalProvider>
-    </PaperProvider>
+    <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
+      <PaperProvider>
+        <GoalProvider>
+          <SafeAreaView style={styles.container}>
+            <Slot />
+          </SafeAreaView>
+        </GoalProvider>
+      </PaperProvider>
+    </StripeProvider>
   );
 }
 

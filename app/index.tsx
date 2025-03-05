@@ -42,7 +42,7 @@ export default function Home() {
   useEffect(() => {
     // Auto-fail goals that have exceeded grace period
     goals.forEach((goal) => {
-      if (shouldAutoFailGoal(goal)) {
+      if (shouldAutoFailGoal(goal) && goal.status !== 'failed') {
         updateGoal(goal.id, { status: 'failed', paymentStatus: 'pending' });
       }
     });
@@ -132,6 +132,16 @@ export default function Home() {
 
               <Text>Status: {item.status}</Text>
               <ProgressBar progress={item.checkIns.length / item.targetDays} color="#4CAF50" style={styles.progressBar} />
+              {/* Pay Now Button - Inline */}
+              {item.status === 'failed' && item.paymentStatus === 'pending' && (
+                <Button
+                  mode="contained"
+                  onPress={() => router.push({ pathname: '/goal/payment', params: { goalId: item.id } })}
+                  style={styles.payButton}
+                >
+                  Pay Now
+                </Button>
+              )}
             </View>
           )}
         />
@@ -189,6 +199,15 @@ const styles = StyleSheet.create({
   menuButton: {
     alignSelf: 'flex-end',
   },
+  progressBar: {
+    height: 10,
+    borderRadius: 5,
+    marginVertical: 10,
+  },
+  payButton: {
+    marginTop: 10,
+    backgroundColor: '#FF4500',
+  },
   createButton: {
     marginVertical: 10,
     backgroundColor: '#4CAF50',
@@ -201,9 +220,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
   },
-  progressBar: {
-    height: 10,
-    borderRadius: 5,
-    marginVertical: 10,
+  warningText: {
+    fontSize: 14,
+    color: '#FF4500',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
