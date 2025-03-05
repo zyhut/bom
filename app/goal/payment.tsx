@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
-import { StripeProvider } from '@stripe/stripe-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useGoals } from '../../store/GoalProvider';
-import { Goal } from '../../types/Goal';
 import { getClientSecret, processPayment } from '../../services/paymentService';
-import { STRIPE_PUBLIC_KEY } from '../../services/keys';
+import { useStripe } from "@stripe/stripe-react-native";
 
 export default function PaymentsScreen() {
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
-  const { goals, updateGoal, goalsLoading } = useGoals(); // ✅ Keep goalsLoading
+  const { goals, updateGoal, goalsLoading } = useGoals();
   const router = useRouter();
   
   const goal = goals.find(g => g.id === goalId);
-  const [paymentLoading, setPaymentLoading] = useState(false); // ✅ Payment loading
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,7 +27,6 @@ export default function PaymentsScreen() {
   }, [goal]);
 
   if (goalsLoading) {
-    // ✅ Show when goal data is still loading
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#1E3A8A" />
@@ -47,6 +45,13 @@ export default function PaymentsScreen() {
   }
 
   const handlePayment = async () => {
+
+    if (!initPaymentSheet || !presentPaymentSheet) {
+      console.error("❌ Stripe methods not available!");
+      Alert.alert("Payment Error", "Stripe is not initialized. Please try again.");
+      return;
+    }
+
     if (!clientSecret) {
       Alert.alert('Payment Error', 'No client secret available. Please try again.');
       return;
@@ -54,7 +59,7 @@ export default function PaymentsScreen() {
 
     setPaymentLoading(true);
     try {
-      const success = await processPayment(clientSecret);
+      const success = await processPayment(clientSecret, initPaymentSheet, presentPaymentSheet);
       if (success) {
         await updateGoal(goal.id, { paymentStatus: 'paid' });
         Alert.alert('Payment Successful', `Your payment of $${goal.stakeAmount} was processed.`);
@@ -69,26 +74,24 @@ export default function PaymentsScreen() {
   };
 
   return (
-    <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Pay Penalty</Text>
-        <Text style={styles.goalTitle}>{goal.title}</Text>
-        <Text>Amount Due: ${goal.stakeAmount}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Pay Penalty</Text>
+      <Text style={styles.goalTitle}>{goal.title}</Text>
+      <Text>Amount Due: ${goal.stakeAmount}</Text>
 
-        {clientSecret === null ? ( // ✅ Show when fetching client secret
-          <ActivityIndicator size="large" color="#1E3A8A" />
-        ) : (
-          <>
-            {paymentLoading ? ( // ✅ Show when processing payment
-              <ActivityIndicator size="large" color="#4CAF50" />
-            ) : (
-              <Button title="Pay Now" onPress={handlePayment} color="#4CAF50" />
-            )}
-            <Button title="Back to Home" onPress={() => router.replace('/')} color="#1E90FF" />
-          </>
-        )}
-      </View>
-    </StripeProvider>
+      {clientSecret === null ? (
+        <ActivityIndicator size="large" color="#1E3A8A" />
+      ) : (
+        <>
+          {paymentLoading ? (
+            <ActivityIndicator size="large" color="#4CAF50" />
+          ) : (
+            <Button title="Pay Now" onPress={handlePayment} color="#4CAF50" />
+          )}
+          <Button title="Back to Home" onPress={() => router.replace('/')} color="#1E90FF" />
+        </>
+      )}
+    </View>
   );
 }
 
