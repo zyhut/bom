@@ -18,7 +18,7 @@ export default function PaymentsScreen() {
   useEffect(() => {
     const fetchSecret = async () => {
       if (goal) {
-        const secret = await getClientSecret(goal.stakeAmount);
+        const secret = await getClientSecret(goal.commitmentAmount);
         setClientSecret(secret);
       }
     };
@@ -62,7 +62,7 @@ export default function PaymentsScreen() {
       const success = await processPayment(clientSecret, initPaymentSheet, presentPaymentSheet);
       if (success) {
         await updateGoal(goal.id, { paymentStatus: 'paid' });
-        Alert.alert('Payment Successful', `Your payment of $${goal.stakeAmount} was processed.`);
+        Alert.alert('Payment Successful', `Your payment of $${goal.commitmentAmount} was processed.`);
         router.replace('/');
       } else {
         Alert.alert('Payment Failed', 'Something went wrong. Please try again.');
@@ -77,7 +77,7 @@ export default function PaymentsScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Pay Penalty</Text>
       <Text style={styles.goalTitle}>{goal.title}</Text>
-      <Text>Amount Due: ${goal.stakeAmount}</Text>
+      <Text>Amount Due: ${goal.commitmentAmount}</Text>
 
       {clientSecret === null ? (
         <ActivityIndicator size="large" color="#1E3A8A" />

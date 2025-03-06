@@ -11,8 +11,8 @@ export type Goal = {
     userId: string;
     createdAt: string; // ISO or Firestore Timestamp
     status: 'active' | 'completed' | 'failed';
-    stakeAmount: number;
-    stakeType: 'app' | 'donation';
+    commitmentAmount: number;
+    commitmentType: 'app' | 'donation';
     paymentStatus: 'ongoing' | 'pending' | 'paid' | 'waived';
     motivation?: string;
     accountabilityPartners?: string[];

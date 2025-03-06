@@ -95,11 +95,11 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Text style={styles.welcome}>
-        {`Welcome to BetOnMyself (BOM), ${user?.displayName ?? 'BOMer'}!`}
+        {`Welcome to C'Meet It (CMIT), ${user?.displayName ?? 'CMITer'}!`}
       </Text>
 
       {goals.length === 0 ? (
-        <Text style={styles.noGoalsText}>No goals yet. Let's set one and start betting on yourself!</Text>
+        <Text style={styles.noGoalsText}>No goals yet. Let's set one and c'meet it!</Text>
       ) : (
         <FlatList
           data={goals}
