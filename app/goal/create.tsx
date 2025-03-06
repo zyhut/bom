@@ -13,7 +13,7 @@ const CreateGoalScreen = () => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [stakeAmount, setStakeAmount] = useState('');
+  const [commitmentAmount, setCommitmentAmount] = useState('');
   const [targetDays, setTargetDays] = useState('');
 
   const [startDate, setStartDate] = useState<Date>(new Date());
@@ -25,14 +25,14 @@ const CreateGoalScreen = () => {
   const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
   const handleCreate = async () => {
-    if (!title || !stakeAmount || !targetDays) {
+    if (!title || !commitmentAmount || !targetDays) {
       Alert.alert('Validation Error', 'Please fill all required fields.');
       return;
     }
 
-    const stake = Number(stakeAmount);
-    if (isNaN(stake) || stake < 1 || stake > 500) {
-      Alert.alert('Validation Error', 'Stake amount must be a number between $1 and $500.');
+    const commitment = Number(commitmentAmount);
+    if (isNaN(commitment) || commitment < 3 || commitment > 500) {
+      Alert.alert('Validation Error', 'Commitment amount must be a number between $3 and $500.');
       return;
     }
 
@@ -41,7 +41,7 @@ const CreateGoalScreen = () => {
     const minEndDate = new Date(startDate.getTime() + 7 * 86400000);
     const maxEndDate = new Date(startDate.getTime() + 365 * 86400000);
 
-    if (startDate < today || startDate > maxStartDate) {
+    if (formatDate(startDate) < formatDate(today) || startDate > maxStartDate) {
       Alert.alert('Validation Error', 'Start date must be within the next 14 days.');
       return;
     }
@@ -73,8 +73,8 @@ const CreateGoalScreen = () => {
       userId: user!.uid,
       createdAt: '',
       status: 'active',
-      stakeAmount: stake,
-      stakeType: 'app',
+      commitmentAmount: commitment,
+      commitmentType: 'app',
       paymentStatus: 'ongoing',
     };
 
@@ -102,9 +102,9 @@ const CreateGoalScreen = () => {
 
       <TextInput
         style={styles.input}
-        placeholder="Stake Amount ($)"
-        value={stakeAmount}
-        onChangeText={setStakeAmount}
+        placeholder="Commitment Amount ($)"
+        value={commitmentAmount}
+        onChangeText={setCommitmentAmount}
         keyboardType="numeric"
       />
 

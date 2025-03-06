@@ -42,7 +42,7 @@ export const processPayment = async (
 
     const { error: initError } = await initPaymentSheet({
       paymentIntentClientSecret: clientSecret,
-      merchantDisplayName: 'BetOnMyself',
+      merchantDisplayName: `C'Meet it`,
       googlePay: true,
       applePay: true,
       allowsDelayedPaymentMethods: true,

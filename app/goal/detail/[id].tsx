@@ -102,7 +102,7 @@ const GoalDetailScreen = () => {
       <Text>Description: {goal.description || 'No description provided'}</Text>
       <Text>Start Date: {goal.startDate}</Text>
       <Text>End Date: {goal.endDate}</Text>
-      <Text>Stake Amount: ${goal.stakeAmount}</Text>
+      <Text>Stake Amount: ${goal.commitmentAmount}</Text>
       <Text>Status: {goal.status}</Text>
       
       <Text>Progress: {progress.toFixed(1)}%</Text>
