@@ -55,15 +55,38 @@ app.post("/create-payment-intent", async (req: Request, res: Response) => {
     const stripe =
       new Stripe(STRIPE_SECRET_KEY.value(), {apiVersion: "2025-02-24.acacia"});
 
-    const {amount} = req.body;
-    if (!amount || typeof amount !== "number") {
+    const {goalId} = req.body;
+    const goalDoc =
+      await admin.firestore().collection("goals").doc(goalId).get();
+    if (!goalDoc.exists) {
+      return res.status(404).json({
+        error: `Goal data not found for goal ID: ${goalId}`,
+      });
+    }
+
+    const goal = goalDoc.data();
+    if (!goal) {
+      return res.status(404).json({
+        error: `Goal not found for goal ID: ${goalId}`,
+      });
+    }
+
+    const amount = goal.commitmentAmount * 100; // Stripe uses cents
+    if (!amount || typeof amount !== "number" || amount <= 0) {
       error("❌ Invalid amount received:", amount);
-      return res.status(400).send({error: "Invalid amount provided"});
+      return res.status(400).send({
+        error: `Invalid amount in the goal. Goal ID: ${goalId}`,
+      });
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100,
+      amount: amount,
       currency: "usd",
+      payment_method_types: ["card"],
+      metadata: {goalId},
+    });
+    await goalDoc.ref.update({
+      paymentIntent,
     });
     log("✅ Payment Intent Created:", paymentIntent.id);
 

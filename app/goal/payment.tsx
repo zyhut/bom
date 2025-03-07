@@ -18,7 +18,7 @@ export default function PaymentsScreen() {
   useEffect(() => {
     const fetchSecret = async () => {
       if (goal) {
-        const secret = await getClientSecret(goal.commitmentAmount);
+        const secret = await getClientSecret(goal.id);
         setClientSecret(secret);
       }
     };
