@@ -2,7 +2,7 @@ import { useStripe } from '@stripe/stripe-react-native';
 import { auth } from "../services/firebaseConfig";
 import { STRIPE_BACKEND_URL } from './keys';
 
-export const getClientSecret = async (amount: number): Promise<string | null> => {
+export const getClientSecret = async (goalId: string): Promise<string | null> => {
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -15,7 +15,7 @@ export const getClientSecret = async (amount: number): Promise<string | null> =>
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ goalId }),
     });
 
     if (!response.ok) {
