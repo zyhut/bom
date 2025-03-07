@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Platform, Pressable } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Switch, Alert, Platform, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useGoals } from '../../store/GoalProvider';
 import { useStore } from '../../store/useStore';
@@ -13,6 +13,7 @@ const CreateGoalScreen = () => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [commitmentType, setCommitmentType] = useState<"standard" | "committed">("standard");
   const [commitmentAmount, setCommitmentAmount] = useState('');
   const [targetDays, setTargetDays] = useState('');
 
@@ -25,15 +26,17 @@ const CreateGoalScreen = () => {
   const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
   const handleCreate = async () => {
-    if (!title || !commitmentAmount || !targetDays) {
+    if (!title || !targetDays) {
       Alert.alert('Validation Error', 'Please fill all required fields.');
       return;
     }
 
-    const commitment = Number(commitmentAmount);
-    if (isNaN(commitment) || commitment < 3 || commitment > 500) {
-      Alert.alert('Validation Error', 'Commitment amount must be a number between $3 and $500.');
-      return;
+    if (commitmentType === "committed") {
+      const commitment = Number(commitmentAmount);
+      if (isNaN(commitment) || commitment < 3 || commitment > 500) {
+        Alert.alert("Validation Error", "Commitment amount must be a number between $3 and $500.");
+        return;
+      }
     }
 
     const today = new Date();
@@ -73,9 +76,9 @@ const CreateGoalScreen = () => {
       userId: user!.uid,
       createdAt: '',
       status: 'active',
-      commitmentAmount: commitment,
-      commitmentType: 'app',
-      paymentStatus: 'ongoing',
+      commitmentType: commitmentType,
+      commitmentAmount: commitmentType === "committed" ? Number(commitmentAmount) : 0,
+      paymentStatus: commitmentType === "committed" ? "pending" : "waived",
     };
 
     await createGoal(newGoal);
@@ -100,13 +103,25 @@ const CreateGoalScreen = () => {
         onChangeText={setDescription}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Commitment Amount ($)"
-        value={commitmentAmount}
-        onChangeText={setCommitmentAmount}
-        keyboardType="numeric"
-      />
+      <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}>
+        <Text>Standard Goal</Text>
+        <Switch
+          value={commitmentType === "committed"}
+          onValueChange={(value) => setCommitmentType(value ? "committed" : "standard")}
+        />
+        <Text>Committed Goal</Text>
+      </View>
+
+      {commitmentType === "committed" && (
+        <>
+          <TextInput
+            keyboardType="numeric"
+            value={commitmentAmount}
+            onChangeText={setCommitmentAmount}
+            placeholder="Commitment Amount (Minimum $3)"
+          />
+        </>
+      )}
 
       <Text style={styles.label}>Start Date:</Text>
       {Platform.OS === 'web' ? (

@@ -13,7 +13,6 @@ export const createGoal = async (goal: Goal) => {
     ...goal,
     createdAt: serverTimestamp(),
     status: 'active',
-    paymentStatus: 'ongoing',
   });
 };
 

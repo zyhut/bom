@@ -43,7 +43,7 @@ export default function Home() {
     // Auto-fail goals that have exceeded grace period
     goals.forEach((goal) => {
       if (shouldAutoFailGoal(goal) && goal.status !== 'failed') {
-        updateGoal(goal.id, { status: 'failed', paymentStatus: 'pending' });
+        updateGoal(goal.id, { status: 'failed', paymentStatus: goal.commitmentType === 'committed' ? 'pending' : 'waived' });
       }
     });
   }, [goals]);
