@@ -12,7 +12,7 @@ export type Goal = {
     createdAt: string; // ISO or Firestore Timestamp
     status: 'active' | 'completed' | 'failed';
     commitmentAmount: number;
-    commitmentType: 'app' | 'donation';
+    commitmentType: 'committed' | 'standard';
     paymentStatus: 'ongoing' | 'pending' | 'paid' | 'waived';
     motivation?: string;
     accountabilityPartners?: string[];
