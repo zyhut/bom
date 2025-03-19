@@ -71,6 +71,14 @@ app.post("/create-payment-intent", async (req: Request, res: Response) => {
       });
     }
 
+    const userId = goal.userId;
+    if (!userId || userId !== decodedToken.uid) {
+      return res.status(403).json({
+        error:
+          `User is not authorized to create payment for goal ID: ${goalId}`,
+      });
+    }
+
     const amount = goal.commitmentAmount * 100; // Stripe uses cents
     if (!amount || typeof amount !== "number" || amount <= 0) {
       error("❌ Invalid amount received:", amount);
