@@ -132,14 +132,13 @@ export default function Home() {
 
               <Text>Status: {item.status}</Text>
               <ProgressBar progress={item.checkIns.length / item.targetDays} color="#4CAF50" style={styles.progressBar} />
-              {/* Pay Now Button - Inline */}
               {item.status === 'failed' && item.paymentStatus === 'pending' && (
                 <Button
                   mode="contained"
                   onPress={() => router.push({ pathname: '/goal/payment', params: { goalId: item.id } })}
                   style={styles.payButton}
                 >
-                  Pay Now
+                  Settle Up
                 </Button>
               )}
             </View>

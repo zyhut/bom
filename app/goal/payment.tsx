@@ -75,7 +75,7 @@ export default function PaymentsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pay Penalty</Text>
+      <Text style={styles.title}>Settle Commitment</Text>
       <Text style={styles.goalTitle}>{goal.title}</Text>
       <Text>Amount Due: ${goal.commitmentAmount}</Text>
 
@@ -86,7 +86,7 @@ export default function PaymentsScreen() {
           {paymentLoading ? (
             <ActivityIndicator size="large" color="#4CAF50" />
           ) : (
-            <Button title="Pay Now" onPress={handlePayment} color="#4CAF50" />
+            <Button title="Settle Up" onPress={handlePayment} color="#4CAF50" />
           )}
           <Button title="Back to Home" onPress={() => router.replace('/')} color="#1E90FF" />
         </>

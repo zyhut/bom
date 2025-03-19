@@ -133,7 +133,7 @@ const GoalDetailScreen = () => {
 
       {goal.status === 'failed' && goal.paymentStatus === 'pending' && (
         <Button 
-          title="Pay Now"
+          title="Settle Up"
           onPress={() => router.push({ pathname: '/goal/payment', params: { goalId: goal.id } })}
           color="#FF4500"
         />
