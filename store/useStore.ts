@@ -1,9 +1,11 @@
 // store/useStore.ts
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { User, onAuthStateChanged, signOut, updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 type AuthState = {
   user: User | null;
@@ -26,6 +28,9 @@ export const useStore = create<AuthState>()(
     {
       name: 'bom-app-storage',
       partialize: (state) => ({ user: state.user }),
+      storage: Platform.OS === 'web'
+        ? createJSONStorage(() => localStorage)
+        : createJSONStorage(() => AsyncStorage),
     }
   )
 );
