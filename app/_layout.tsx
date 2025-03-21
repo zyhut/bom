@@ -1,30 +1,28 @@
-// app/_layout.tsx
-
 import React from 'react';
 import { Slot } from 'expo-router';
 import { GoalProvider } from '../store/GoalProvider';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { SafeAreaView, StyleSheet } from 'react-native';
-import { StripeProvider } from "@stripe/stripe-react-native";
-import { STRIPE_PUBLIC_KEY } from "../services/keys";
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { STRIPE_PUBLIC_KEY } from '../services/keys';
+import { useColorScheme, SafeAreaView } from 'react-native';
+import { lightTheme, darkTheme } from '../theme/theme';
+import { ThemedScreen } from '../components/ThemedScreen';
 
 export default function Layout() {
+  const colorScheme = useColorScheme();
+  const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
+
   return (
-    <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
-      <PaperProvider>
-        <GoalProvider>
-          <SafeAreaView style={styles.container}>
-            <Slot />
-          </SafeAreaView>
-        </GoalProvider>
-      </PaperProvider>
-    </StripeProvider>
+    <SafeAreaView style={{ flex: 1 }}> {/* ✅ Prevent notch overlap */}
+      <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
+        <PaperProvider theme={theme}>
+          <GoalProvider>
+            <ThemedScreen>
+              <Slot />
+            </ThemedScreen>
+          </GoalProvider>
+        </PaperProvider>
+      </StripeProvider>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#87CEEB', // Light blue theme background
-  },
-});
