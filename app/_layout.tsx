@@ -13,7 +13,7 @@ export default function Layout() {
   const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}> {/* ✅ Prevent notch overlap */}
+    <SafeAreaView style={{ flex: 1 }}>
       <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
         <PaperProvider theme={theme}>
           <GoalProvider>
