@@ -87,7 +87,7 @@ export default function Login() {
         duration={3000}
         action={{ label: 'Close', onPress: () => setSnackbarVisible(false) }}
       >
-        {snackbarMessage}
+        <ThemedText>{String(snackbarMessage ?? '')}</ThemedText>
       </Snackbar>
     </>
   );
