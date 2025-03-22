@@ -1,13 +1,14 @@
 // app/auth/login.tsx
-
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import InputField from '../../components/InputField';
-import CustomButton from '../../components/CustomButton';
-import { logIn, signInWithGoogle } from '../../services/authService';
 import { Snackbar } from 'react-native-paper';
+import { logIn, signInWithGoogle } from '../../services/authService';
 import { useStore } from '../../store/useStore';
+import { ThemedScreen } from '../../components/ThemedScreen';
+import { ThemedInput } from '../../components/ThemedInput';
+import { ThemedButton } from '../../components/ThemedButton';
+import { ThemedText } from '../../components/ThemedText';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,14 +21,10 @@ export default function Login() {
   const handleLogIn = async () => {
     try {
       const user = await logIn(email, password);
-      setUser(user); // Update Zustand store with the logged-in user
+      setUser(user);
       setSnackbarMessage('Logged in successfully!');
       setSnackbarVisible(true);
-
-      // Delay navigation to ensure the Snackbar is visible
-      setTimeout(() => {
-        router.push('/'); // Navigate to the home screen
-      }, 1000);
+      setTimeout(() => router.push('/'), 1000);
     } catch (error: any) {
       setSnackbarMessage(error.message);
       setSnackbarVisible(true);
@@ -37,14 +34,10 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       const user = await signInWithGoogle();
-      setUser(user); // Update Zustand store with the logged-in user
+      setUser(user);
       setSnackbarMessage('Logged in with Google!');
       setSnackbarVisible(true);
-
-      // Delay navigation to ensure the Snackbar is visible
-      setTimeout(() => {
-        router.push('/'); // Navigate to the home screen
-      }, 1000);
+      setTimeout(() => router.push('/'), 1000);
     } catch (error: any) {
       setSnackbarMessage(error.message);
       setSnackbarVisible(true);
@@ -52,42 +45,71 @@ export default function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Log In</Text>
-      <InputField placeholder="Email" value={email} onChangeText={setEmail} />
-      <InputField
-        placeholder="Password"
+    <>
+      <ThemedText variant="headlineMedium" style={styles.title}>
+        Log In
+      </ThemedText>
+
+      <ThemedInput
+        label="Email"
+        placeholder="Enter your email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        style={styles.input}
+      />
+
+      <ThemedInput
+        label="Password"
+        placeholder="Enter your password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        style={styles.input}
       />
-      <CustomButton title="Log In" onPress={handleLogIn} />
-      <CustomButton
-        title="Sign In with Google"
+
+      <ThemedButton onPress={handleLogIn} style={styles.button}>Log In</ThemedButton>
+
+      <ThemedButton
         onPress={handleGoogleSignIn}
-        backgroundColor="#DB4437"
-      />
+        style={[styles.button, styles.googleButton]}>
+          Sign In with Google
+      </ThemedButton>
+
       <Link href="/auth/signup">
-        <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
+        <ThemedText style={styles.linkText}>Don't have an account? Sign Up</ThemedText>
       </Link>
 
       <Snackbar
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
         duration={3000}
-        action={{
-          label: 'Close',
-          onPress: () => setSnackbarVisible(false),
-        }}
+        action={{ label: 'Close', onPress: () => setSnackbarVisible(false) }}
       >
-        <Text>{String(snackbarMessage ?? '')}</Text>
+        <ThemedText>{String(snackbarMessage ?? '')}</ThemedText>
       </Snackbar>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#87CEEB' },
-  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20 },
-  linkText: { color: '#1E3A8A', marginTop: 20, textAlign: 'center' },
+  title: {
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    marginBottom: 16,
+  },
+  button: {
+    marginVertical: 6,
+    borderRadius: 8,
+  },
+  googleButton: {
+    backgroundColor: '#DB4437',
+  },
+  linkText: {
+    marginTop: 20,
+    textAlign: 'center',
+  },
 });

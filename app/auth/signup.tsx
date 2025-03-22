@@ -1,14 +1,15 @@
 // app/auth/signup.tsx
-
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import InputField from '../../components/InputField';
-import CustomButton from '../../components/CustomButton';
 import { signUp } from '../../services/authService';
 import { Snackbar } from 'react-native-paper';
 import { updateProfile } from 'firebase/auth';
 import { useStore } from '../../store/useStore';
+import { ThemedScreen } from '../../components/ThemedScreen';
+import { ThemedInput } from '../../components/ThemedInput';
+import { ThemedButton } from '../../components/ThemedButton';
+import { ThemedText } from '../../components/ThemedText';
 
 export default function SignUp() {
   const [name, setName] = useState('');
@@ -23,19 +24,16 @@ export default function SignUp() {
     try {
       const user = await signUp(email, password);
 
-      // ✅ Update the user's display name in Firebase
       if (user && name) {
         await updateProfile(user, { displayName: name });
       }
 
-      // ✅ Update Zustand state and navigate directly to Home
       setUser({ ...user, displayName: name });
-
       setSnackbarMessage('Account created successfully!');
       setSnackbarVisible(true);
 
       setTimeout(() => {
-        router.push('/'); // Navigate directly to Home
+        router.push('/');
       }, 1000);
     } catch (error: any) {
       setSnackbarMessage(error.message);
@@ -44,19 +42,41 @@ export default function SignUp() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <InputField placeholder="Name" value={name} onChangeText={setName} />
-      <InputField placeholder="Email" value={email} onChangeText={setEmail} />
-      <InputField
-        placeholder="Password"
+    <>
+      <ThemedText variant="headlineMedium" style={styles.title}>
+        Sign Up
+      </ThemedText>
+
+      <ThemedInput
+        label="Name"
+        placeholder="Enter your name"
+        value={name}
+        onChangeText={setName}
+        style={styles.input}
+      />
+      <ThemedInput
+        label="Email"
+        placeholder="Enter your email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        style={styles.input}
+      />
+      <ThemedInput
+        label="Password"
+        placeholder="Enter your password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        style={styles.input}
       />
-      <CustomButton title="Sign Up" onPress={handleSignUp} />
+
+      <ThemedButton onPress={handleSignUp} style={styles.button}>Sign Up</ThemedButton>
+
       <Link href="/auth/login">
-        <Text style={styles.linkText}>Already have an account? Log in</Text>
+        <ThemedText style={styles.linkText}>
+          Already have an account? Log in
+        </ThemedText>
       </Link>
 
       <Snackbar
@@ -68,14 +88,30 @@ export default function SignUp() {
           onPress: () => setSnackbarVisible(false),
         }}
       >
-        <Text>{String(snackbarMessage ?? '')}</Text>
+        <ThemedText>{String(snackbarMessage ?? '')}</ThemedText>
       </Snackbar>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#87CEEB' },
-  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20 },
-  linkText: { color: '#1E3A8A', marginTop: 20, textAlign: 'center' },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  title: {
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    marginBottom: 12,
+  },
+  button: {
+    marginTop: 10,
+  },
+  linkText: {
+    marginTop: 20,
+    textAlign: 'center',
+    color: '#1E3A8A',
+  },
 });
