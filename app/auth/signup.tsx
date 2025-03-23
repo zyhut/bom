@@ -7,7 +7,6 @@ import { Snackbar, Button } from 'react-native-paper';
 import { updateProfile } from 'firebase/auth';
 import { useStore } from '../../store/useStore';
 import { ThemedInput } from '../../components/ThemedInput';
-import { ThemedButton } from '../../components/ThemedButton';
 import { ThemedText } from '../../components/ThemedText';
 
 export default function SignUp() {
