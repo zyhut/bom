@@ -126,10 +126,7 @@ export default function Home() {
       }
       renderItem={({ item }) => {
         const hasCheckedInToday = item.checkIns.includes(today);
-        const remainingDays = Math.max(
-          0,
-          Math.ceil((new Date(item.endDate).getTime() - Date.now()) / 86400000)
-        );
+        const remainingDays = item.targetDays - item.checkIns.length;
 
         const isNotStarted = today < item.startDate;
         const isCompleted = item.status === 'completed';
@@ -175,7 +172,7 @@ export default function Home() {
               <View style={{ flex: 1 }}>
                 <ThemedText style={styles.goalTitle}>{item.title}</ThemedText>
                 <ThemedText variant="bodySmall" style={{ color: colors.secondary }}>
-                  ${item.commitmentAmount} | Ends: {item.endDate} | {remainingDays} days left
+                  ${item.commitmentAmount} | Due: {item.endDate} | {remainingDays} check-ins left
                 </ThemedText>
               </View>
               <Menu
