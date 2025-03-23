@@ -3,10 +3,9 @@ import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { signUp } from '../../services/authService';
-import { Snackbar } from 'react-native-paper';
+import { Snackbar, Button } from 'react-native-paper';
 import { updateProfile } from 'firebase/auth';
 import { useStore } from '../../store/useStore';
-import { ThemedScreen } from '../../components/ThemedScreen';
 import { ThemedInput } from '../../components/ThemedInput';
 import { ThemedButton } from '../../components/ThemedButton';
 import { ThemedText } from '../../components/ThemedText';
@@ -71,7 +70,7 @@ export default function SignUp() {
         style={styles.input}
       />
 
-      <ThemedButton onPress={handleSignUp} style={styles.button}>Sign Up</ThemedButton>
+      <Button mode="contained" onPress={handleSignUp} style={styles.button}>Sign Up</Button>
 
       <Link href="/auth/login">
         <ThemedText style={styles.linkText}>
@@ -112,6 +111,6 @@ const styles = StyleSheet.create({
   linkText: {
     marginTop: 20,
     textAlign: 'center',
-    color: '#1E3A8A',
+    textDecorationLine: 'underline',
   },
 });

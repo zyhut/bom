@@ -2,12 +2,10 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import { Snackbar } from 'react-native-paper';
+import { Snackbar, Button, Divider, useTheme } from 'react-native-paper';
 import { logIn, signInWithGoogle } from '../../services/authService';
 import { useStore } from '../../store/useStore';
-import { ThemedScreen } from '../../components/ThemedScreen';
 import { ThemedInput } from '../../components/ThemedInput';
-import { ThemedButton } from '../../components/ThemedButton';
 import { ThemedText } from '../../components/ThemedText';
 
 export default function Login() {
@@ -17,6 +15,7 @@ export default function Login() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const router = useRouter();
   const setUser = useStore((state) => state.setUser);
+  const { colors } = useTheme();
 
   const handleLogIn = async () => {
     try {
@@ -69,17 +68,28 @@ export default function Login() {
         style={styles.input}
       />
 
-      <ThemedButton onPress={handleLogIn} style={styles.button}>Log In</ThemedButton>
-
-      <ThemedButton
-        onPress={handleGoogleSignIn}
-        style={[styles.button, styles.googleButton]}>
-          Sign In with Google
-      </ThemedButton>
+      <Button
+        mode="contained"
+        onPress={handleLogIn}
+        style={styles.button}
+      >
+          Log In
+        </Button>
 
       <Link href="/auth/signup">
         <ThemedText style={styles.linkText}>Don't have an account? Sign Up</ThemedText>
       </Link>
+
+      <Divider bold={true} style={styles.devider} theme={{ colors: { outlineVariant: colors.primary } }}/>
+      <ThemedText style={styles.deviderText}>Or</ThemedText>
+
+      <Button
+        mode="outlined"
+        onPress={handleGoogleSignIn}
+        icon="google"
+        style={[styles.button, styles.googleButton]}>
+          Sign In with Google
+      </Button>
 
       <Snackbar
         visible={snackbarVisible}
@@ -106,10 +116,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   googleButton: {
-    backgroundColor: '#DB4437',
   },
   linkText: {
     marginTop: 20,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  devider: {
+    marginVertical: 20,
+  },
+  deviderText: {
     textAlign: 'center',
   },
 });

@@ -1,30 +1,28 @@
 // theme.ts
 import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 
-const glacierPrimary = '#0D47A1'; // Deep glacier blue
-const glacierSecondary = '#4FC3F7'; // Lighter blue like sky reflection
-const glacierBackground = '#E3F2FD'; // Soft ice blue
-const glacierSurface = '#FFFFFF'; // Clean glacier white
-const glacierError = '#D32F2F'; // Keep strong red for alerts
-
 const lightColors = {
   ...MD3LightTheme.colors,
-  primary: glacierPrimary,
-  secondary: glacierSecondary,
-  background: glacierBackground,
-  surface: glacierSurface,
-  error: glacierError,
-  onPrimary: '#FFFFFF',
+  primary: '#6172a2',
+  secondary: '#a29161',
+  background: '#e5e6f2',
+  outline: '#6172a2',
+  surface: '#f4f5f9',
+  error: '#a84000',
+  onPrimary: '#d0c8b0',
+  onSurfaceDisabled: '#a29161',
 };
 
 const darkColors = {
   ...MD3DarkTheme.colors,
-  primary: glacierSecondary,
-  secondary: '#81D4FA', // Icy highlight
-  background: '#0A192F', // Deep navy glacier night
-  surface: '#102840', // Surface glacier shade
-  error: glacierError,
-  onPrimary: '#000000',
+  primary: '#6172a2',
+  secondary: '#a29161',
+  background: '#0A192F',
+  outline: '#6172a2',
+  surface: '#102840',
+  error: '#a26172',
+  onPrimary: '#a29161',
+  onSurfaceDisabled: '#a29161',
 };
 
 export const lightTheme = {

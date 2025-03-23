@@ -19,7 +19,11 @@ export const ThemedButton = ({ children, onPress, style }: Props) => {
       style={[{ backgroundColor: colors.primary, borderRadius: 8 }, style]}
       onPress={onPress}
     >
-      <ThemedText style={{ color: colors.onPrimary }}>{children}</ThemedText>
+      <ThemedText
+        style={{ color: colors.onPrimary, fontWeight: "bold"}}
+      >
+          {children}
+      </ThemedText>
     </Button>
   );
 };

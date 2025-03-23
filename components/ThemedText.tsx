@@ -1,20 +1,21 @@
 // components/ThemedText.tsx
 import React from 'react';
-import { useTheme } from 'react-native-paper';
-import { StyleProp, TextStyle, Text } from 'react-native';
+import { useTheme, Text } from 'react-native-paper';
+import { StyleProp, TextStyle, Text as RNText } from 'react-native';
 
 type Props = {
   children: React.ReactNode;
   style?: StyleProp<TextStyle>;
-  variant?: keyof typeof Text['displayName'];
+  variant?: "bodyMedium",
   color?: string;
 };
 
-export const ThemedText = ({ children, style, color, ...props }: Props) => {
+export const ThemedText = ({ children, style, variant, color, ...props }: Props) => {
   const { colors } = useTheme();
 
   return (
     <Text
+      variant={variant}
       style={[{ color: color || colors.primary }, style]}
       {...props}
     >

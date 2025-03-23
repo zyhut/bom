@@ -1,13 +1,15 @@
 // components/SignOutButton.tsx
 
 import React from 'react';
-import CustomButton from './CustomButton';
+import { Button, useTheme } from 'react-native-paper';
+import { ThemedButton } from './ThemedButton';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store/useStore';
 
 const SignOutButton: React.FC = () => {
   const router = useRouter();
   const logout = useStore((state) => state.logout);
+  const { colors } = useTheme();
 
   const handleLogout = async () => {
     await logout();
@@ -15,11 +17,13 @@ const SignOutButton: React.FC = () => {
   };
 
   return (
-    <CustomButton 
-      title="Sign Out" 
-      onPress={handleLogout} 
-      backgroundColor="#FF6347" 
-    />
+    <Button
+      mode="text"
+      onPress={handleLogout}
+      textColor={colors.error}
+    >
+      Sign Out
+    </Button>
   );
 };
 

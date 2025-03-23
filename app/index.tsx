@@ -8,12 +8,11 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
 import SignOutButton from '../components/SignOutButton';
 import { useGoals } from '../store/GoalProvider';
-import { Menu, Divider, ProgressBar, IconButton, useTheme } from 'react-native-paper';
+import { Menu, Divider, ProgressBar, IconButton, useTheme, Button } from 'react-native-paper';
 import { format } from 'date-fns';
 import { canDeleteGoal, canCreateNewGoal, shouldAutoFailGoal } from '../services/goalUtils';
-import { ThemedScreen } from '../components/ThemedScreen';
 import { ThemedText } from '../components/ThemedText';
-import { ThemedButton } from '../components/ThemedButton';
+import { ThemedCard } from '@/components/ThemedCard';
 
 export default function Home() {
   const [appReady, setAppReady] = useState(false);
@@ -103,8 +102,8 @@ export default function Home() {
       contentContainerStyle={{ paddingBottom: 16 }}
       ListHeaderComponent={
         <>
-          <ThemedText variant="headlineSmall" style={styles.welcome}>
-            {`Welcome to C'Meet It (CMIT), ${user?.displayName ?? 'CMITer'}!`}
+          <ThemedText variant="headlineMedium" style={styles.welcome}>
+            {`Welcome to C'Meet It, ${user?.displayName ?? 'CMITer'}!`}
           </ThemedText>
           {goals.length === 0 && (
             <ThemedText variant="bodyLarge" style={styles.noGoalsText}>
@@ -115,9 +114,13 @@ export default function Home() {
       }
       ListFooterComponent={
         <>
-          <ThemedButton mode="contained" onPress={handleCreateGoal} style={styles.createButton}>
-            Create New Goal
-          </ThemedButton>
+          <Button
+            mode="outlined"
+            icon="plus-thick"
+            onPress={handleCreateGoal} 
+            style={styles.createButton}>
+            New Goal
+          </Button>
           <SignOutButton />
         </>
       }
@@ -167,12 +170,12 @@ export default function Home() {
         };
 
         return (
-          <View style={styles.goalContainer}>
+          <ThemedCard style={styles.goalContainer}  onLongPress={() => router.push(`/goal/detail/${item.id}`)}>
             <View style={styles.goalHeader}>
               <View style={{ flex: 1 }}>
                 <ThemedText style={styles.goalTitle}>{item.title}</ThemedText>
-                <ThemedText variant="bodySmall" style={{ color: colors.outline }}>
-                  Ends: {item.endDate} | {remainingDays} days left
+                <ThemedText variant="bodySmall" style={{ color: colors.secondary }}>
+                  ${item.commitmentAmount} | Ends: {item.endDate} | {remainingDays} days left
                 </ThemedText>
               </View>
               <Menu
@@ -184,7 +187,7 @@ export default function Home() {
                     size={24}
                     onPress={() => setMenuVisible(item.id)}
                     accessibilityLabel="More options"
-                    color="#333"
+                    iconColor={colors.secondary}
                   />
                 }
               >
@@ -199,27 +202,20 @@ export default function Home() {
             <ProgressBar
               progress={item.checkIns.length / item.targetDays}
               color={item.status === 'failed' ? colors.error : colors.primary}
-              style={styles.progressBar}
+              style={[{ backgroundColor: colors.background }, styles.progressBar]}
             />
 
-            <ThemedButton
-              mode={actionDisabled ? 'outlined' : 'contained'}
+            <Button
+              mode={'contained'}
               disabled={actionDisabled}
               onPress={handleActionPress}
               style={[
                 styles.checkInButton,
-                actionDisabled && {
-                  backgroundColor: colors.surfaceDisabled,
-                  borderColor: colors.outline,
-                },
               ]}
-              labelStyle={{
-                color: actionDisabled ? colors.onSurfaceDisabled : colors.primary,
-              }}
             >
               {actionLabel}
-            </ThemedButton>
-          </View>
+            </Button>
+          </ThemedCard>
         );
       }}
     />
@@ -232,7 +228,6 @@ const styles = StyleSheet.create({
   welcome: { marginBottom: 20, textAlign: 'center' },
   noGoalsText: { marginVertical: 20, textAlign: 'center' },
   goalContainer: {
-    backgroundColor: '#FFFFFF',
     padding: 15,
     marginVertical: 10,
     borderRadius: 8,
@@ -249,7 +244,6 @@ const styles = StyleSheet.create({
   },
   createButton: {
     marginVertical: 10,
-    borderRadius: 8,
     paddingVertical: 10,
   },
   loadingText: {
@@ -258,7 +252,6 @@ const styles = StyleSheet.create({
   goalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1E3A8A',
   },
   goalHeader: {
     flexDirection: 'row',
@@ -267,7 +260,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   checkInButton: {
-    marginTop: 10,
-    borderColor: '#1E3A8A',
+    marginTop: 5,
   },
 });
