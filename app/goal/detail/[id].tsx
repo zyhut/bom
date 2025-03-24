@@ -195,7 +195,7 @@ const GoalDetailScreen = () => {
 
         {canBeFailedEarly && (
           <Button
-            mode="outlined"
+            mode="text"
             textColor={colors.error}
             style={{ marginTop: 10, borderColor: colors.error }}
             onPress={handleFailNow}
