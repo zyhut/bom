@@ -20,7 +20,7 @@ const SignOutButton: React.FC = () => {
     <Button
       mode="text"
       onPress={handleLogout}
-      textColor={colors.error}
+      textColor={colors.tertiary}
     >
       Sign Out
     </Button>
