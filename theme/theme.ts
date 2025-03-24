@@ -11,6 +11,7 @@ const lightColors = {
   error: '#a84000',
   onPrimary: '#a29161',
   onSurfaceDisabled: '#a29161',
+  onSecondaryContainer: '#a29161',
 };
 
 const darkColors = {
@@ -23,6 +24,7 @@ const darkColors = {
   error: '#a26172',
   onPrimary: '#a29161',
   onSurfaceDisabled: '#a29161',
+  onSecondaryContainer: '#a29161',
 };
 
 export const lightTheme = {
