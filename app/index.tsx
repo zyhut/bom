@@ -184,7 +184,7 @@ export default function Home() {
                     size={24}
                     onPress={() => setMenuVisible(item.id)}
                     accessibilityLabel="More options"
-                    iconColor={colors.secondary}
+                    iconColor={colors.primary}
                   />
                 }
               >

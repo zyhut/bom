@@ -9,7 +9,7 @@ const lightColors = {
   outline: '#6172a2',
   surface: '#f4f5f9',
   error: '#a84000',
-  onPrimary: '#d0c8b0',
+  onPrimary: '#a29161',
   onSurfaceDisabled: '#a29161',
 };
 

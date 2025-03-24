@@ -13,7 +13,7 @@ const CreateGoalScreen = () => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [commitmentType, setCommitmentType] = useState<"standard" | "committed">("standard");
+  const [commitmentType, setCommitmentType] = useState<"standard" | "committed">("committed");
   const [commitmentAmount, setCommitmentAmount] = useState('');
   const [targetDays, setTargetDays] = useState('');
 
