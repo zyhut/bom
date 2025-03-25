@@ -14,16 +14,12 @@ export const ThemedButton = ({ children, onPress, style }: Props) => {
 
   return (
     <Button
-      mode="contained"
-      textColor={colors.onPrimary}
-      style={[{ backgroundColor: colors.primary, borderRadius: 8 }, style]}
+      mode="outlined"
+      textColor={colors.primary}
+      style={[{ borderRadius: 8 }, style]}
       onPress={onPress}
     >
-      <ThemedText
-        style={{ color: colors.onPrimary, fontWeight: "bold"}}
-      >
-          {children}
-      </ThemedText>
+      {children}
     </Button>
   );
 };

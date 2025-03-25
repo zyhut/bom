@@ -98,7 +98,6 @@ const GoalDetailScreen = () => {
         selected: true,
         selectedColor: colors.primary,
         dotColor: colors.primary,
-        textColor: 'white',
       };
       return acc;
     }, {} as Record<string, any>);
@@ -137,7 +136,7 @@ const GoalDetailScreen = () => {
           calendarBackground: colors.surface,
           selectedDayBackgroundColor: colors.primary,
           selectedDayTextColor: colors.onPrimary,
-          todayTextColor: colors.secondary,
+          todayTextColor: colors.primary,
           dotColor: colors.secondary,
           arrowColor: colors.primary,
           indicatorColor: colors.secondary,
@@ -168,13 +167,13 @@ const GoalDetailScreen = () => {
           )}
         </View>
 
-        <ThemedText variant="bodySmall">Description: </ThemedText><ThemedText variant="bodySmall" style={{ color: colors.secondary }}>{goal.description || 'No description provided'}</ThemedText>
-        <ThemedText variant="bodySmall">Start:  </ThemedText><ThemedText variant="bodySmall" style={{ color: colors.secondary }}>{goal.startDate}</ThemedText>
-        <ThemedText variant="bodySmall">End:  </ThemedText><ThemedText variant="bodySmall" style={{ color: colors.secondary }}>{goal.endDate}</ThemedText>
-        <ThemedText variant="bodySmall">Target Days:  </ThemedText><ThemedText variant="bodySmall" style={{ color: colors.secondary }}>{goal.targetDays}</ThemedText>
-        <ThemedText variant="bodySmall">Remaining Check-Ins:  </ThemedText><ThemedText variant="bodySmall" style={{ color: colors.secondary }}>{remainingCheckIns}</ThemedText>
-        <ThemedText variant="bodySmall">Commitment:  </ThemedText><ThemedText variant="bodySmall" style={{ color: colors.secondary }}>${goal.commitmentAmount}</ThemedText>
-        <ThemedText variant="bodySmall">Status:  </ThemedText><ThemedText variant="bodySmall" style={{ color: colors.secondary }}>{goal.status}</ThemedText>
+        <ThemedText variant="bodyMedium">Description: {goal.description || 'No description provided'}</ThemedText>
+        <ThemedText variant="bodyMedium">Start: {goal.startDate}</ThemedText>
+        <ThemedText variant="bodyMedium">End: {goal.endDate}</ThemedText>
+        <ThemedText variant="bodyMedium">Target Days: {goal.targetDays}</ThemedText>
+        <ThemedText variant="bodyMedium">Remaining Check-Ins: {remainingCheckIns}</ThemedText>
+        <ThemedText variant="bodyMedium">Commitment: ${goal.commitmentAmount}</ThemedText>
+        <ThemedText variant="bodyMedium">Status: {goal.status}</ThemedText>
 
         <ProgressBar
           progress={goal.checkIns.length / goal.targetDays}
@@ -185,11 +184,15 @@ const GoalDetailScreen = () => {
               : colors.primary
           }
         />
-        <ThemedText variant="labelSmall" color={colors.secondary} style={styles.progressText}>
+        <ThemedText variant="labelSmall" style={styles.progressText}>
           {goal.checkIns.length}/{goal.targetDays} Check-Ins
         </ThemedText>
 
-        <Button mode="contained" disabled={actionDisabled} onPress={handlePrimaryAction} style={styles.checkInButton}>
+        <Button mode="outlined"
+          disabled={actionDisabled}
+          textColor={colors.secondary}
+          theme={{ colors: { outline: colors.secondary } }}
+          onPress={handlePrimaryAction} style={styles.checkInButton}>
           {actionLabel}
         </Button>
 
@@ -207,7 +210,7 @@ const GoalDetailScreen = () => {
 
       <ThemedCard style={styles.card}>
         <ThemedText variant="titleMedium" style={styles.subheader}>Check-In Calendar</ThemedText>
-        <ThemedText variant="bodySmall" style={{ color: colors.onSecondaryContainer, marginBottom: 10 }}>
+        <ThemedText variant="bodySmall" style={{ color: colors.secondary, marginBottom: 10 }}>
           📅 Tap a past date (within the last 3 days) to backfill a missed check-in.
         </ThemedText>
         {renderCalendar()}

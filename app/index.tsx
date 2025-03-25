@@ -140,7 +140,7 @@ export default function Home() {
             <View style={styles.goalHeader}>
               <View style={{ flex: 1 }}>
                 <ThemedText style={styles.goalTitle}>{item.title}</ThemedText>
-                <ThemedText variant="bodySmall" style={{ color: colors.secondary }}>
+                <ThemedText variant="bodySmall">
                   ${item.commitmentAmount} | Due: {item.endDate} | {remainingDays} check-ins left
                 </ThemedText>
               </View>
@@ -153,7 +153,7 @@ export default function Home() {
                     size={24}
                     onPress={() => setMenuVisible(item.id)}
                     accessibilityLabel="More options"
-                    iconColor={colors.primary}
+                    iconColor={colors.secondary}
                   />
                 }
               >
@@ -179,10 +179,12 @@ export default function Home() {
             />
 
             <Button
-              mode={'contained'}
+              mode={'outlined'}
               disabled={disabled}
               onPress={handleActionPress}
+              textColor={colors.secondary}
               style={styles.checkInButton}
+              theme={{ colors: { outline: colors.secondary } }}
             >
               {label}
             </Button>

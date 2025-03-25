@@ -81,7 +81,7 @@ const CreateGoalScreen = () => {
       endDate <= startDate || endDate < minEndDate || endDate > maxEndDate,
       setEndDateError,
       endDateAnim,
-      'End date must be after start date and within 1 year.'
+      'End date must be 1 week after start date and within 1 year.'
     );
     const isTargetDaysValid = validateAndAnimate(
       isNaN(targetDaysNum) || targetDaysNum < 1 || targetDaysNum > maxTargetDays,
@@ -257,7 +257,7 @@ const CreateGoalScreen = () => {
           <HelpTip message="The number of days you aim to check in. You can leave room for cheat days!" />
         </View>
 
-        <ThemedButton mode="contained" onPress={handleCreate} style={styles.createButton}>
+        <ThemedButton mode="outlined" onPress={handleCreate} style={styles.createButton}>
           Create Goal
         </ThemedButton>
       </ThemedCard>
