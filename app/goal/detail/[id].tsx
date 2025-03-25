@@ -212,7 +212,7 @@ const GoalDetailScreen = () => {
         </ThemedText>
         {renderCalendar()}
       </ThemedCard>
-      <Button onPress={() => router.replace('/')} style={{ marginBottom: 10 }}>
+      <Button mode="text" onPress={() => router.replace('/')} style={{ marginBottom: 10 }}>
         Back to Home
       </Button>
     </ScrollView>
