@@ -115,11 +115,12 @@ const CreateGoalScreen = () => {
     return (
       <Tooltip
         isVisible={visible}
-        content={<ThemedText style={[{ color: colors.primary, backgroundColor: colors.surface }, styles.tooltipText]}>{message}</ThemedText>}
+        content={<ThemedText style={[{ color: colors.primary, backgroundColor: colors.background }, styles.tooltipText]}>{message}</ThemedText>}
         placement="top"
         backgroundColor="transparent"
         onClose={() => setVisible(false)}
         contentStyle={styles.tooltip}
+        arrowStyle={{ borderTopColor: colors.background }}
       >
         <IconButton
           icon="help-circle-outline"
@@ -169,7 +170,7 @@ const CreateGoalScreen = () => {
             />
             <PaperText>Committed</PaperText>
           </View>
-          <HelpTip message="Committed goals require a $ amount and you’ll pay it if not completed. Standard goals are free." />
+          <HelpTip message="Committed goals involve a commitment amount you’ll need to settle if the goal isn’t completed. Standard goals have no financial commitment." />
         </View>
 
         {commitmentType === 'committed' && (
@@ -189,7 +190,7 @@ const CreateGoalScreen = () => {
                 </Animated.View>
               )}
             </View>
-            <HelpTip message="This is how much you're committing to pay if the goal isn't completed. e.g. $20" />
+            <HelpTip message="This is your commitment amount — the value you’ll need to settle if the goal isn’t completed. e.g. $20" />
           </View>
         )}
 
