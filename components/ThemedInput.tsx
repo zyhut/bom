@@ -12,6 +12,10 @@ type Props = {
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   style?: StyleProp<ViewStyle>;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  multiline?: boolean;
+  numberOfLines?: number;
+  editable?: boolean;
+  error?: boolean;
 };
 
 export const ThemedInput = ({
@@ -23,6 +27,10 @@ export const ThemedInput = ({
   keyboardType = 'default',
   style,
   autoCapitalize = 'none',
+  multiline = false,
+  numberOfLines,
+  editable = true,
+  error = false,
 }: Props) => {
   const { colors } = useTheme();
 
@@ -39,6 +47,10 @@ export const ThemedInput = ({
       outlineColor={colors.primary}
       activeOutlineColor={colors.primary}
       style={style}
+      multiline={multiline}
+      numberOfLines={numberOfLines}
+      editable={editable}
+      error={error}
     />
   );
 };
