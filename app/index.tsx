@@ -1,5 +1,3 @@
-// app/index.tsx
-
 import React, { useState, useEffect } from 'react';
 import { FlatList, Alert, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -9,10 +7,11 @@ import { auth } from '../services/firebaseConfig';
 import SignOutButton from '../components/SignOutButton';
 import { useGoals } from '../store/GoalProvider';
 import { Menu, Divider, ProgressBar, IconButton, useTheme, Button } from 'react-native-paper';
-import { format } from 'date-fns';
+import { format, differenceInCalendarDays } from 'date-fns';
 import { canDeleteGoal, canCreateNewGoal, shouldAutoFailGoal } from '../services/goalUtils';
 import { ThemedText } from '../components/ThemedText';
 import { ThemedCard } from '@/components/ThemedCard';
+import { getGoalActionMeta } from '../utils/goalActionUtils';
 
 export default function Home() {
   const [appReady, setAppReady] = useState(false);
@@ -125,53 +124,23 @@ export default function Home() {
         </>
       }
       renderItem={({ item }) => {
-        const hasCheckedInToday = item.checkIns.includes(today);
+        const { label, disabled, type } = getGoalActionMeta(item);
         const remainingDays = item.targetDays - item.checkIns.length;
 
-        const isNotStarted = today < item.startDate;
-        const isCompleted = item.status === 'completed';
-        const isFailedPaid = item.status === 'failed' && item.paymentStatus === 'paid';
-        const isFailedPending = item.status === 'failed' && item.paymentStatus === 'pending';
-
-        let actionLabel = 'Check In Today';
-        let actionDisabled = false;
-        let actionType: 'checkin' | 'settle' | null = 'checkin';
-
-        if (isNotStarted) {
-          actionLabel = 'Not Started';
-          actionDisabled = true;
-          actionType = null;
-        } else if (isCompleted) {
-          actionLabel = 'Completed';
-          actionDisabled = true;
-          actionType = null;
-        } else if (isFailedPaid) {
-          actionLabel = 'Settled';
-          actionDisabled = true;
-          actionType = null;
-        } else if (isFailedPending) {
-          actionLabel = 'Settle Up';
-          actionType = 'settle';
-        } else if (hasCheckedInToday) {
-          actionLabel = 'Checked In';
-          actionDisabled = true;
-          actionType = null;
-        }
-
         const handleActionPress = () => {
-          if (actionType === 'checkin') {
+          if (type === 'checkin') {
             handleCheckInToday(item.id);
-          } else if (actionType === 'settle') {
+          } else if (type === 'settle') {
             router.push({ pathname: '/goal/payment', params: { goalId: item.id } });
           }
         };
 
         return (
-          <ThemedCard style={styles.goalContainer}  onLongPress={() => router.push(`/goal/detail/${item.id}`)}>
+          <ThemedCard style={styles.goalContainer} onLongPress={() => router.push(`/goal/detail/${item.id}`)}>
             <View style={styles.goalHeader}>
               <View style={{ flex: 1 }}>
                 <ThemedText style={styles.goalTitle}>{item.title}</ThemedText>
-                <ThemedText variant="bodySmall" style={{ color: colors.secondary }}>
+                <ThemedText variant="bodySmall">
                   ${item.commitmentAmount} | Due: {item.endDate} | {remainingDays} check-ins left
                 </ThemedText>
               </View>
@@ -198,19 +167,26 @@ export default function Home() {
 
             <ProgressBar
               progress={item.checkIns.length / item.targetDays}
-              color={item.status === 'failed' ? colors.error : colors.primary}
+              color={
+                item.status === 'failed' ||
+                  (item.status === 'active' &&
+                    differenceInCalendarDays(new Date(item.endDate), new Date()) <
+                    item.targetDays - item.checkIns.length)
+                  ? colors.error
+                  : colors.primary
+              }
               style={[{ backgroundColor: colors.background }, styles.progressBar]}
             />
 
             <Button
-              mode={'contained'}
-              disabled={actionDisabled}
+              mode={'outlined'}
+              disabled={disabled}
               onPress={handleActionPress}
-              style={[
-                styles.checkInButton,
-              ]}
+              textColor={colors.secondary}
+              style={styles.checkInButton}
+              theme={{ colors: { outline: colors.secondary } }}
             >
-              {actionLabel}
+              {label}
             </Button>
           </ThemedCard>
         );
