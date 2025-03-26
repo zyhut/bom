@@ -146,24 +146,14 @@ export default function Home() {
                 <View style={{ flex: 1 }}>
                   <ThemedText style={styles.goalTitle}>{item.title}</ThemedText>
                   <ThemedText variant="bodySmall">
-                    ${item.commitmentAmount} | Due: {item.endDate} | {remainingCheckIns} check-ins left
+                    <ThemedText style={{ color: colors.secondary }}>${item.commitmentAmount}</ThemedText> | Due: {item.endDate} | {remainingCheckIns} check-ins left
                   </ThemedText>
                 </View>
-                <Menu
-                  visible={menuVisible === item.id}
-                  onDismiss={() => setMenuVisible(null)}
-                  anchor={
-                    <IconButton
-                      icon="dots-vertical"
-                      onPress={() => setMenuVisible(item.id)}
-                      iconColor={colors.primary}
-                    />
-                  }
-                >
-                  <Menu.Item onPress={() => router.push(`/goal/detail/${item.id}`)} title="View Details" />
-                  <Divider />
-                  <Menu.Item onPress={() => handleDeleteGoal(item.id)} title="Delete" />
-                </Menu>
+                <IconButton
+                  icon="dots-vertical"
+                  onPress={() => router.push(`/goal/detail/${item.id}`)}
+                  iconColor={colors.primary}
+                />
               </View>
               <ThemedText>Status: {item.status}</ThemedText>
               <ProgressBar
@@ -198,7 +188,7 @@ export default function Home() {
         theme={{ colors: { inverseOnSurface: colors.error } }}
         onDismiss={() => setShowSnackbar(false)}
         duration={3000}
-        action={{ label: 'OK', textColor: colors.primary, onPress: () => {} }}
+        action={{ label: 'OK', textColor: colors.primary, onPress: () => { } }}
       >
         You either have unpaid goals or too many ongoing goals.
       </Snackbar>
