@@ -6,17 +6,18 @@ import { ThemedText } from './ThemedText';
 type Props = {
   children: React.ReactNode;
   onPress: () => void;
+  mode?: 'text' | 'outlined' | 'contained' | 'elevated' | 'contained-tonal';
   textColor?: string;
   theme?: any;
   style?: any;
 };
 
-export const ThemedButton = ({ children, onPress, textColor, theme, style }: Props) => {
+export const ThemedButton = ({ children, onPress, mode, textColor, theme, style }: Props) => {
   const { colors } = useTheme();
 
   return (
     <Button
-      mode="outlined"
+      mode={mode || 'outlined'}
       textColor={textColor || colors.primary}
       style={[{ borderRadius: 8 }, style]}
       theme={theme}

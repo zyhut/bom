@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, StyleSheet, ActivityIndicator } from 'react-native';
+import { Alert, StyleSheet, ActivityIndicator, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useGoals } from '../../store/GoalProvider';
 import { getClientSecret, processPayment } from '../../services/paymentService';
-import { useStripe } from "@stripe/stripe-react-native";
+import { useStripe } from '@stripe/stripe-react-native';
 import { ThemedText } from '../../components/ThemedText';
 import { ThemedButton } from '../../components/ThemedButton';
 import { ThemedCard } from '../../components/ThemedCard';
-import { View } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import LottieView from 'lottie-react-native';
 
 export default function PaymentsScreen() {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -16,10 +16,12 @@ export default function PaymentsScreen() {
   const { goals, updateGoal, goalsLoading } = useGoals();
   const router = useRouter();
   const { colors } = useTheme();
-  
+
   const goal = goals.find(g => g.id === goalId);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentErrorMessage, setPaymentErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSecret = async () => {
@@ -33,8 +35,8 @@ export default function PaymentsScreen() {
 
   const handlePayment = async () => {
     if (!initPaymentSheet || !presentPaymentSheet) {
-      console.error("❌ Stripe methods not available!");
-      Alert.alert("Payment Error", "Stripe is not initialized. Please try again.");
+      console.error('❌ Stripe methods not available!');
+      Alert.alert('Payment Error', 'Stripe is not initialized. Please try again.');
       return;
     }
 
@@ -44,18 +46,23 @@ export default function PaymentsScreen() {
     }
 
     setPaymentLoading(true);
+    setPaymentErrorMessage(null);
+
     try {
       const success = await processPayment(clientSecret, initPaymentSheet, presentPaymentSheet);
       if (success) {
         await updateGoal(goal.id, { paymentStatus: 'paid' });
-        Alert.alert('Payment Successful', `Your commitment of $${goal.commitmentAmount} is settled.`);
-        router.replace('/');
+        setPaymentSuccess(true);
+        setTimeout(() => {
+          router.replace('/');
+        }, 2000);
       } else {
-        Alert.alert('Payment Failed', 'Something went wrong. Please try again.');
+        setPaymentErrorMessage('Something went wrong. Please try again.');
       }
     } catch (error) {
-      Alert.alert('Payment Error', 'An error occurred during payment.');
+      setPaymentErrorMessage('An error occurred during payment.');
     }
+
     setPaymentLoading(false);
   };
 
@@ -80,26 +87,41 @@ export default function PaymentsScreen() {
   return (
     <View style={styles.container}>
       <ThemedCard style={styles.card}>
-        <ThemedText variant="titleMedium" style={styles.title}>Settle Commitment</ThemedText>
-        <ThemedText style={styles.subtitle}>{goal.title}</ThemedText>
-        <ThemedText style={styles.amount}>Amount Due: ${goal.commitmentAmount}</ThemedText>
-
-        {clientSecret === null ? (
-          <ActivityIndicator size="large" color="#1E3A8A" />
+        {paymentSuccess ? (
+          <LottieView
+            source={require('../../assets/animations/payment-success.json')}
+            autoPlay
+            loop={false}
+            style={{ height: 120 }}
+          />
         ) : (
           <>
-            {paymentLoading ? (
+            <ThemedText variant="titleMedium" style={styles.title}>Settle Commitment</ThemedText>
+            <ThemedText style={styles.subtitle}>{goal.title}</ThemedText>
+            <ThemedText style={styles.amount}>Amount Due: ${goal.commitmentAmount}</ThemedText>
+
+            {paymentErrorMessage && (
+              <ThemedText style={styles.errorText}>{paymentErrorMessage}</ThemedText>
+            )}
+
+            {clientSecret === null ? (
+              <ActivityIndicator size="large" color="#1E3A8A" />
+            ) : paymentLoading ? (
               <ActivityIndicator size="large" color="#4CAF50" />
             ) : (
-                  <ThemedButton
-                    textColor={colors.secondary}
-                    theme={{ colors: { outline: colors.secondary } }}
-                    onPress={handlePayment}
-                  >Settle Up</ThemedButton>
+              <>
+                <ThemedButton
+                  textColor={colors.secondary}
+                  theme={{ colors: { outline: colors.secondary } }}
+                  onPress={handlePayment}
+                >
+                  Settle Up
+                </ThemedButton>
+                <ThemedButton onPress={() => router.replace('/')} style={styles.backButton}>
+                  Back to Home
+                </ThemedButton>
+              </>
             )}
-            <ThemedButton onPress={() => router.replace('/')} style={styles.backButton}>
-              Back to Home
-            </ThemedButton>
           </>
         )}
       </ThemedCard>
@@ -113,8 +135,8 @@ const styles = StyleSheet.create({
   card: { padding: 20 },
   title: { textAlign: 'center', marginBottom: 10 },
   subtitle: { textAlign: 'center', marginBottom: 10 },
-  amount: { textAlign: 'center', marginBottom: 20 },
-  errorText: { fontSize: 18, color: '#FF4500', textAlign: 'center', marginTop: 20 },
+  amount: { textAlign: 'center', marginBottom: 10 },
+  errorText: { color: '#FF3B30', textAlign: 'center', marginVertical: 10 },
   loadingText: { fontSize: 18, color: '#555', textAlign: 'center', marginTop: 10 },
   backButton: { marginTop: 10 }
 });
