@@ -1,6 +1,6 @@
 // app/goal/detail/[id].tsx
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Button, ProgressBar, IconButton, useTheme } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
@@ -11,6 +11,7 @@ import { canDeleteGoal, shouldAutoFailGoal } from '../../../services/goalUtils';
 import { ThemedText } from '../../../components/ThemedText';
 import { ThemedCard } from '../../../components/ThemedCard';
 import { getGoalActionMeta } from '../../../utils/goalActionUtils';
+import CelebrationPopup from '../../../components/CelebrationPopup';
 
 const GoalDetailScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,6 +19,7 @@ const GoalDetailScreen = () => {
   const router = useRouter();
   const { colors } = useTheme();
   const [goal, setGoal] = useState<Goal | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
   const today = format(new Date(), 'yyyy-MM-dd');
 
   useEffect(() => {
@@ -30,7 +32,6 @@ const GoalDetailScreen = () => {
           status: 'failed',
           paymentStatus: foundGoal.commitmentType === 'committed' ? 'pending' : 'waived',
         });
-        Alert.alert('Goal Auto-Failed', 'You can handle the payment now.');
         router.replace('/');
       }
     }
@@ -46,7 +47,8 @@ const GoalDetailScreen = () => {
     };
 
     if (updatedGoal.status === 'completed') {
-      Alert.alert('Goal Completed!', 'Congratulations on completing your goal!');
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 3000);
     }
 
     await updateGoal(goal.id, updatedGoal);
@@ -63,18 +65,13 @@ const GoalDetailScreen = () => {
     if (!goal || goal.status !== 'active') return;
     if (date < goal.startDate || date > goal.endDate || goal.checkIns.includes(date)) return;
 
-    Alert.alert('Confirm Backfill', `Do you want to backfill for ${date}?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Yes', onPress: () => handleCheckIn(date) },
-    ]);
+    handleCheckIn(date);
   };
 
   const handleDeleteGoal = async () => {
     if (goal && canDeleteGoal(goal)) {
       await deleteGoal(goal.id);
       router.replace('/');
-    } else {
-      Alert.alert('Cannot Delete', 'This goal cannot be deleted after 3 days.');
     }
   };
 
@@ -84,7 +81,6 @@ const GoalDetailScreen = () => {
         status: 'failed',
         paymentStatus: goal.commitmentType === 'committed' ? 'pending' : 'waived',
       });
-      Alert.alert('Goal Failed', 'You marked this goal as failed.');
       router.replace('/');
     }
   };
@@ -102,7 +98,6 @@ const GoalDetailScreen = () => {
       return acc;
     }, {} as Record<string, any>);
 
-    // Highlight today
     markedDates[today] = {
       ...markedDates[today],
       dotColor: colors.tertiary,
@@ -153,72 +148,79 @@ const GoalDetailScreen = () => {
 
   const remainingCheckIns = goal.targetDays - goal.checkIns.length;
   const remainingDays = differenceInCalendarDays(parseISO(goal.endDate), new Date());
-
   const { label: actionLabel, disabled: actionDisabled } = getGoalActionMeta(goal);
   const canBeFailedEarly = goal.status === 'active' && remainingDays < remainingCheckIns;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <ThemedCard style={styles.card}>
-        <View style={styles.header}>
-          <ThemedText variant="headlineMedium">{goal.title}</ThemedText>
-          {canDeleteGoal(goal) && (
-            <IconButton icon="delete-outline" onPress={handleDeleteGoal} accessibilityLabel="Delete Goal" />
-          )}
-        </View>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <ThemedCard style={styles.card}>
+          <View style={styles.header}>
+            <ThemedText variant="headlineMedium">{goal.title}</ThemedText>
+            {canDeleteGoal(goal) && (
+              <IconButton icon="delete-outline" onPress={handleDeleteGoal} accessibilityLabel="Delete Goal" />
+            )}
+          </View>
 
-        <ThemedText variant="bodyMedium">Description: {goal.description || 'No description provided'}</ThemedText>
-        <ThemedText variant="bodyMedium">Start: {goal.startDate}</ThemedText>
-        <ThemedText variant="bodyMedium">End: {goal.endDate}</ThemedText>
-        <ThemedText variant="bodyMedium">Target Days: {goal.targetDays}</ThemedText>
-        <ThemedText variant="bodyMedium">Remaining Check-Ins: {remainingCheckIns}</ThemedText>
-        <ThemedText variant="bodyMedium">Commitment: ${goal.commitmentAmount}</ThemedText>
-        <ThemedText variant="bodyMedium">Status: {goal.status}</ThemedText>
+          <ThemedText variant="bodyMedium">Description: {goal.description || 'No description provided'}</ThemedText>
+          <ThemedText variant="bodyMedium">Start: {goal.startDate}</ThemedText>
+          <ThemedText variant="bodyMedium">End: {goal.endDate}</ThemedText>
+          <ThemedText variant="bodyMedium">Target Days: {goal.targetDays}</ThemedText>
+          <ThemedText variant="bodyMedium">Remaining Check-Ins: {remainingCheckIns}</ThemedText>
+          <ThemedText variant="bodyMedium">Commitment: ${goal.commitmentAmount}</ThemedText>
+          <ThemedText variant="bodyMedium">Status: {goal.status}</ThemedText>
 
-        <ProgressBar
-          progress={goal.checkIns.length / goal.targetDays}
-          style={[{ backgroundColor: colors.background }, styles.progressBar]}
-          color={
-            goal.status === 'failed' || remainingDays < remainingCheckIns
-              ? colors.error
-              : colors.primary
-          }
-        />
-        <ThemedText variant="labelSmall" style={styles.progressText}>
-          {goal.checkIns.length}/{goal.targetDays} Check-Ins
-        </ThemedText>
+          <ProgressBar
+            progress={goal.checkIns.length / goal.targetDays}
+            style={[{ backgroundColor: colors.background }, styles.progressBar]}
+            color={
+              goal.status === 'failed' || remainingDays < remainingCheckIns
+                ? colors.error
+                : colors.primary
+            }
+          />
+          <ThemedText variant="labelSmall" style={styles.progressText}>
+            {goal.checkIns.length}/{goal.targetDays} Check-Ins
+          </ThemedText>
 
-        <Button mode="outlined"
-          disabled={actionDisabled}
-          textColor={colors.secondary}
-          theme={{ colors: { outline: colors.secondary } }}
-          onPress={handlePrimaryAction} style={styles.checkInButton}>
-          {actionLabel}
-        </Button>
-
-        {canBeFailedEarly && (
-          <Button
-            mode="text"
-            textColor={colors.error}
-            style={{ marginTop: 10, borderColor: colors.error }}
-            onPress={handleFailNow}
-          >
-            Mark as Failed
+          <Button mode="outlined"
+            disabled={actionDisabled}
+            textColor={colors.secondary}
+            theme={{ colors: { outline: colors.secondary } }}
+            onPress={handlePrimaryAction}
+            style={styles.checkInButton}>
+            {actionLabel}
           </Button>
-        )}
-      </ThemedCard>
 
-      <ThemedCard style={styles.card}>
-        <ThemedText variant="titleMedium" style={styles.subheader}>Check-In Calendar</ThemedText>
-        <ThemedText variant="bodySmall" style={{ color: colors.secondary, marginBottom: 10 }}>
-          📅 Tap a past date (within the last 3 days) to backfill a missed check-in.
-        </ThemedText>
-        {renderCalendar()}
-      </ThemedCard>
-      <Button mode="text" onPress={() => router.replace('/')} style={{ marginBottom: 10 }}>
-        Back to Home
-      </Button>
-    </ScrollView>
+          {canBeFailedEarly && (
+            <Button
+              mode="text"
+              textColor={colors.error}
+              style={{ marginTop: 10, borderColor: colors.error }}
+              onPress={handleFailNow}
+            >
+              Mark as Failed
+            </Button>
+          )}
+        </ThemedCard>
+
+        <ThemedCard style={styles.card}>
+          <ThemedText variant="titleMedium" style={styles.subheader}>Check-In Calendar</ThemedText>
+          <ThemedText variant="bodySmall" style={{ color: colors.secondary, marginBottom: 10 }}>
+            📅 Tap a past date (within the last 3 days) to backfill a missed check-in.
+          </ThemedText>
+          {renderCalendar()}
+        </ThemedCard>
+        <Button mode="text" onPress={() => router.replace('/')} style={{ marginBottom: 10 }}>
+          Back to Home
+        </Button>
+      </ScrollView>
+
+      <CelebrationPopup
+        visible={showCelebration}
+        onDismiss={() => setShowCelebration(false)}
+      />
+    </>
   );
 };
 
