@@ -169,7 +169,11 @@ export default function Home() {
                 <View style={{ flex: 1 }}>
                   <ThemedText style={styles.goalTitle}>{item.title}</ThemedText>
                   <ThemedText variant="bodySmall">
-                    <ThemedText style={{ color: colors.secondary }}>${item.commitmentAmount}</ThemedText> | Due: {item.endDate} | {remainingCheckIns} check-ins left
+                    <ThemedText style={{ color: colors.secondary }}>${item.commitmentAmount}</ThemedText>
+                    <ThemedText style={{ color: colors.tertiary }}> | </ThemedText>
+                    Due: {item.endDate}
+                    <ThemedText style={{ color: colors.tertiary }}> | </ThemedText>
+                    {remainingCheckIns} check-ins left
                   </ThemedText>
                 </View>
                 <IconButton

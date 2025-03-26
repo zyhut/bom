@@ -17,7 +17,7 @@ const darkColors = {
   ...MD3DarkTheme.colors,
   primary: '#5a9ae3',
   secondary: '#b9904a',
-  tertiary: '#013d66',
+  tertiary: '#1d5faa',
   background: '#000a11',
   outline: '#0267ab',
   surface: '#001422',
