@@ -1,6 +1,7 @@
 // app/index.tsx
 import React, { useState, useEffect } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
@@ -14,6 +15,7 @@ import { ThemedText } from '../components/ThemedText';
 import { ThemedCard } from '../components/ThemedCard';
 import { Button, Divider, IconButton, Menu, ProgressBar, Snackbar, useTheme } from 'react-native-paper';
 import CelebrationPopup from '../components/CelebrationPopup';
+import GoalFailedDialog from '../components/GoalFailedDialog';
 
 export default function Home() {
   const [appReady, setAppReady] = useState(false);
@@ -26,6 +28,8 @@ export default function Home() {
   const router = useRouter();
   const { colors } = useTheme();
   const today = format(new Date(), 'yyyy-MM-dd');
+  const [showFailedDialog, setShowFailedDialog] = useState(false);
+  const [failedGoalId, setFailedGoalId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -77,6 +81,23 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const checkGoalPopup = async () => {
+      const lastShownDate = await AsyncStorage.getItem('goalFailedPopupShownDate');
+      if (lastShownDate !== today) {
+        const failedUnpaidGoal = goals.find(
+          (g) => g.status === 'failed' && g.paymentStatus === 'pending'
+        );
+        if (failedUnpaidGoal) {
+          setFailedGoalId(failedUnpaidGoal.id);
+          setShowFailedDialog(true);
+          await AsyncStorage.setItem('goalFailedPopupShownDate', today);
+        }
+      }
+    };
+    checkGoalPopup();
+  }, [goals]);
+
   const handleCreateGoal = () => {
     if (canCreateNewGoal(goals)) {
       router.push('/goal/create');
@@ -95,6 +116,8 @@ export default function Home() {
       </>
     );
   }
+
+  const failedGoal = goals.find((g) => g.id === failedGoalId);
 
   return (
     <>
@@ -177,6 +200,20 @@ export default function Home() {
               </Button>
             </ThemedCard>
           );
+        }}
+      />
+
+      <GoalFailedDialog
+        visible={showFailedDialog}
+        goalTitle={failedGoal?.title}
+        commitmentAmount={failedGoal?.commitmentAmount}
+        endDate={failedGoal?.endDate}
+        onDismiss={() => setShowFailedDialog(false)}
+        onSettleUp={() => {
+          setShowFailedDialog(false);
+          if (failedGoalId) {
+            router.push({ pathname: '/goal/payment', params: { goalId: failedGoalId } });
+          }
         }}
       />
 
