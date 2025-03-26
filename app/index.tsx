@@ -85,6 +85,17 @@ export default function Home() {
     }
   };
 
+  if (!appReady || goalsLoading) {
+    return (
+      <>
+        <ProgressBar indeterminate color="#1E3A8A" />
+        <ThemedText variant="labelLarge" style={styles.loadingText}>
+          Loading goals...
+        </ThemedText>
+      </>
+    );
+  }
+
   return (
     <>
       <FlatList
@@ -208,6 +219,9 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     marginVertical: 10,
+  },
+  loadingText: {
+    marginTop: 16,
   },
   createButton: {
     marginVertical: 10,
