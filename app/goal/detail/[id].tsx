@@ -10,6 +10,7 @@ import { Goal } from '../../../types/Goal';
 import { canDeleteGoal, shouldAutoFailGoal } from '../../../services/goalUtils';
 import { ThemedText } from '../../../components/ThemedText';
 import { ThemedCard } from '../../../components/ThemedCard';
+import { ThemedScreen } from '../../../components/ThemedScreen';
 import { getGoalActionMeta } from '../../../utils/goalActionUtils';
 import CelebrationPopup from '../../../components/CelebrationPopup';
 
@@ -152,7 +153,7 @@ const GoalDetailScreen = () => {
   const canBeFailedEarly = goal.status === 'active' && remainingDays < remainingCheckIns;
 
   return (
-    <>
+    <ThemedScreen>
       <ScrollView contentContainerStyle={styles.container}>
         <ThemedCard style={styles.card}>
           <View style={styles.header}>
@@ -220,7 +221,7 @@ const GoalDetailScreen = () => {
         visible={showCelebration}
         onDismiss={() => setShowCelebration(false)}
       />
-    </>
+    </ThemedScreen>
   );
 };
 

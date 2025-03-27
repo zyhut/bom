@@ -7,6 +7,7 @@ import { useStripe } from '@stripe/stripe-react-native';
 import { ThemedText } from '../../components/ThemedText';
 import { ThemedButton } from '../../components/ThemedButton';
 import { ThemedCard } from '../../components/ThemedCard';
+import { ThemedScreen } from '../../components/ThemedScreen';
 import { useTheme } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
 
@@ -68,24 +69,24 @@ export default function PaymentsScreen() {
 
   if (goalsLoading) {
     return (
-      <View style={styles.centered}>
+      <ThemedScreen>
         <ActivityIndicator size="large" color="#1E3A8A" />
         <ThemedText style={styles.loadingText}>Loading goal...</ThemedText>
-      </View>
+      </ThemedScreen>
     );
   }
 
   if (!goal) {
     return (
-      <View style={styles.centered}>
+      <ThemedScreen>
         <ThemedText style={styles.errorText}>Goal not found or already paid.</ThemedText>
         <ThemedButton onPress={() => router.replace('/')}>Back to Home</ThemedButton>
-      </View>
+      </ThemedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ThemedScreen>
       <ThemedCard style={styles.card}>
         {paymentSuccess ? (
           <LottieView
@@ -125,7 +126,7 @@ export default function PaymentsScreen() {
           </>
         )}
       </ThemedCard>
-    </View>
+    </ThemedScreen>
   );
 }
 

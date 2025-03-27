@@ -8,6 +8,7 @@ import { updateProfile } from 'firebase/auth';
 import { useStore } from '../../store/useStore';
 import { ThemedInput } from '../../components/ThemedInput';
 import { ThemedText } from '../../components/ThemedText';
+import { ThemedScreen } from '../../components/ThemedScreen';
 
 export default function SignUp() {
   const [name, setName] = useState('');
@@ -40,7 +41,7 @@ export default function SignUp() {
   };
 
   return (
-    <>
+    <ThemedScreen>
       <ThemedText variant="headlineMedium" style={styles.title}>
         Sign Up
       </ThemedText>
@@ -88,7 +89,7 @@ export default function SignUp() {
       >
         <ThemedText>{String(snackbarMessage ?? '')}</ThemedText>
       </Snackbar>
-    </>
+    </ThemedScreen>
   );
 }
 

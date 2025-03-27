@@ -1,21 +1,21 @@
-// app/index.tsx
 import React, { useState, useEffect } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../services/firebaseConfig';
-import SignOutButton from '../components/SignOutButton';
-import { useStore } from '../store/useStore';
-import { useGoals } from '../store/GoalProvider';
-import { canDeleteGoal, canCreateNewGoal, shouldAutoFailGoal } from '../services/goalUtils';
-import { getGoalActionMeta } from '../utils/goalActionUtils';
+import { auth } from '../../services/firebaseConfig';
+import SignOutButton from '../../components/SignOutButton';
+import { useStore } from '../../store/useStore';
+import { useGoals } from '../../store/GoalProvider';
+import { canDeleteGoal, canCreateNewGoal, shouldAutoFailGoal } from '../../services/goalUtils';
+import { getGoalActionMeta } from '../../utils/goalActionUtils';
 import { format, differenceInCalendarDays } from 'date-fns';
-import { ThemedText } from '../components/ThemedText';
-import { ThemedCard } from '../components/ThemedCard';
-import { Button, Divider, IconButton, Menu, ProgressBar, Snackbar, useTheme } from 'react-native-paper';
-import CelebrationPopup from '../components/CelebrationPopup';
-import GoalFailedDialog from '../components/GoalFailedDialog';
+import { ThemedText } from '../../components/ThemedText';
+import { ThemedCard } from '../../components/ThemedCard';
+import { Button, IconButton, ProgressBar, Snackbar, useTheme } from 'react-native-paper';
+import CelebrationPopup from '../../components/CelebrationPopup';
+import GoalFailedDialog from '../../components/GoalFailedDialog';
+import { ThemedScreen } from '../../components/ThemedScreen';
 
 export default function Home() {
   const [appReady, setAppReady] = useState(false);
@@ -100,7 +100,7 @@ export default function Home() {
 
   const handleCreateGoal = () => {
     if (canCreateNewGoal(goals)) {
-      router.push('/goal/create');
+      router.push('./create');
     } else {
       setShowSnackbar(true);
     }
@@ -108,23 +108,23 @@ export default function Home() {
 
   if (!appReady || goalsLoading) {
     return (
-      <>
+      <ThemedScreen>
         <ProgressBar indeterminate color="#1E3A8A" />
         <ThemedText variant="labelLarge" style={styles.loadingText}>
           Loading goals...
         </ThemedText>
-      </>
+      </ThemedScreen>
     );
   }
 
   const failedGoal = goals.find((g) => g.id === failedGoalId);
 
   return (
-    <>
+    <ThemedScreen>
       <FlatList
         data={goals}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 16 }}
+        contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
         ListHeaderComponent={
           <>
             <ThemedText variant="headlineMedium" style={styles.welcome}>
@@ -233,7 +233,7 @@ export default function Home() {
       >
         You either have unpaid goals or too many ongoing goals.
       </Snackbar>
-    </>
+    </ThemedScreen>
   );
 }
 

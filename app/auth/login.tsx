@@ -7,6 +7,7 @@ import { logIn, signInWithGoogle } from '../../services/authService';
 import { useStore } from '../../store/useStore';
 import { ThemedInput } from '../../components/ThemedInput';
 import { ThemedText } from '../../components/ThemedText';
+import { ThemedScreen } from '../../components/ThemedScreen';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -44,7 +45,7 @@ export default function Login() {
   };
 
   return (
-    <>
+    <ThemedScreen>
       <ThemedText variant="headlineMedium" style={styles.title}>
         Log In
       </ThemedText>
@@ -81,7 +82,7 @@ export default function Login() {
       </Link>
 
       <Divider bold={true} style={styles.devider} theme={{ colors: { outlineVariant: colors.primary } }}/>
-      <ThemedText style={styles.deviderText}>Or</ThemedText>
+      <ThemedText style={styles.deviderText}>or</ThemedText>
 
       <Button
         mode="outlined"
@@ -99,7 +100,7 @@ export default function Login() {
       >
         <ThemedText>{String(snackbarMessage ?? '')}</ThemedText>
       </Snackbar>
-    </>
+    </ThemedScreen>
   );
 }
 

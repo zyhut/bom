@@ -6,7 +6,6 @@ import { StripeProvider } from '@stripe/stripe-react-native';
 import { STRIPE_PUBLIC_KEY } from '../services/keys';
 import { useColorScheme, SafeAreaView } from 'react-native';
 import { lightTheme, darkTheme } from '../theme/theme';
-import { ThemedScreen } from '../components/ThemedScreen';
 
 export default function Layout() {
   const colorScheme = useColorScheme();
@@ -17,9 +16,7 @@ export default function Layout() {
       <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
         <PaperProvider theme={theme}>
           <GoalProvider>
-            <ThemedScreen>
-              <Slot />
-            </ThemedScreen>
+            <Slot />
           </GoalProvider>
         </PaperProvider>
       </StripeProvider>
