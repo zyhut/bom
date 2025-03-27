@@ -1,50 +1,101 @@
-# Welcome to your Expo app 👋
+# C'Meet It (CMIT) 🎯
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Welcome to **C'Meet It** — an app that helps you stay committed to your goals with a unique commitment-based system!
 
-## Get started
+---
 
-1. Install dependencies
+## 🛠️ Tech Stack
 
-   ```bash
-   npm install
-   ```
+- **React Native** (via Expo)
+- **Firebase** (Auth, Firestore, Functions)
+- **Stripe** (Goal commitment payments)
+- **Zustand** (Global state management)
+- **react-native-paper** (Theming & UI components)
+- **Lottie** (Celebration animations)
+- **date-fns** (Date utilities)
 
-2. Start the app
+---
 
-   ```bash
-    npx expo start
-   ```
+## 🚀 Getting Started
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Clone the repo
 
 ```bash
-npm run reset-project
+git clone https://github.com/zyhut/bom.git
+cd bom/bom-app
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Install dependencies
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Run the app
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+You’ll be able to open the app in:
 
-Join our community of developers creating universal apps.
+- 📱 Expo Go
+- 📱 iOS Simulator
+- 📱 Android Emulator
+- 🧪 Development Build
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## 🧠 Project Structure
+
+- `/app` – all your screens, components, and routes
+- `/components` – shared UI components
+- `/utils` – utility functions (e.g., date formatting, validation)
+- `/constants` – theming and color tokens
+- `/firebase` – Firebase-related setup
+- `/functions` – backend cloud functions
+
+---
+
+## ✅ Features
+
+- Goal creation with flexible options (standard or commitment-based)
+- Check-in system to track daily goal progress
+- Celebration for completed goals 🎉
+- Penalty handling and payment processing for failed goals
+- Responsive, mobile-friendly UI with custom theming
+- Animations for key user moments
+
+---
+
+## 💡 Dev Tips
+
+- Use the `GoalActionUtils.ts` for goal check-in logic
+- Shared UI lives in `/components/themed`
+- Environment variables are managed via `.env` (not committed)
+
+---
+
+## 🔐 Environment Setup
+
+Make sure to create a `.env` file with your Firebase and Stripe keys:
+
+```
+STRIPE_PUBLISHABLE_KEY=your_key
+FIREBASE_API_KEY=your_key
+...
+```
+
+---
+
+## 👥 Community & Support
+
+- [Expo Discord](https://chat.expo.dev)
+- [Firebase Docs](https://firebase.google.com/docs)
+- [Stripe Docs](https://stripe.com/docs)
+
+---
+
+## 📜 License
+
+MIT
