@@ -12,8 +12,12 @@ export default function TabLayout() {
                 headerShown: false,
                 tabBarStyle: {
                     backgroundColor: colors.surfaceContainer,
+                    shadowColor: colors.shadow,
+                    shadowOffset: { width: 0, height: -3 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 3,
                     borderTopWidth: 0,
-                    elevation: 8,
+                    elevation: 9,
                     height: 60, // slightly smaller height
                     paddingBottom: Platform.OS === 'ios' ? 5 : 0, // minimal padding
                 },
@@ -26,6 +30,7 @@ export default function TabLayout() {
                 tabBarItemStyle: {
                 },
                 tabBarActiveTintColor: colors.primary,
+                tabBarInactiveTintColor: colors.outline,
             }}
         >
             <Tabs.Screen
@@ -42,7 +47,7 @@ export default function TabLayout() {
                 options={{
                     title: 'Goal',
                     tabBarIcon: ({ focused, color, size }) => (
-                        <MaterialCommunityIcons name={focused ? "plus-box" : "plus-thick"} color={color} size={size} />
+                        <MaterialCommunityIcons name={focused ? "plus-box" : "plus"} color={color} size={size} />
                     ),
                 }}
             />

@@ -125,9 +125,9 @@ export default function Home() {
         contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
         ListHeaderComponent={
           <>
-            <Text variant="headlineSmall" style={[{ color: colors.primary }, styles.welcome]}>
-              C'Meet It, 
-              <Text style={{color: colors.tertiary}}>{` ${user?.displayName ?? 'CMITer'} 🙌`}</Text>
+            <Text variant="headlineSmall" style={[{ color: colors.tertiary }, styles.welcome]}>
+              {`${user?.displayName ?? 'CMITer'}, `}
+              <Text style={{color: colors.primary}}>C'Meet It!</Text>
             </Text>
             {goals.length === 0 && (
               <Text variant="bodyLarge" style={styles.noGoalsText}>
