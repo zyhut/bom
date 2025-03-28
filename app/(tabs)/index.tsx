@@ -10,9 +10,7 @@ import { useGoals } from '../../store/GoalProvider';
 import { canDeleteGoal, canCreateNewGoal, shouldAutoFailGoal } from '../../services/goalUtils';
 import { getGoalActionMeta } from '../../utils/goalActionUtils';
 import { format, differenceInCalendarDays } from 'date-fns';
-import { ThemedText } from '../../components/ThemedText';
-import { ThemedCard } from '../../components/ThemedCard';
-import { Button, IconButton, ProgressBar, Snackbar, useTheme } from 'react-native-paper';
+import { Button, Card, Text, IconButton, ProgressBar, Snackbar, useTheme } from 'react-native-paper';
 import CelebrationPopup from '../../components/CelebrationPopup';
 import GoalFailedDialog from '../../components/GoalFailedDialog';
 import { ThemedScreen } from '../../components/ThemedScreen';
@@ -110,9 +108,9 @@ export default function Home() {
     return (
       <ThemedScreen>
         <ProgressBar indeterminate color="#1E3A8A" />
-        <ThemedText variant="labelLarge" style={styles.loadingText}>
+        <Text variant="labelLarge" style={styles.loadingText}>
           Loading goals...
-        </ThemedText>
+        </Text>
       </ThemedScreen>
     );
   }
@@ -127,13 +125,14 @@ export default function Home() {
         contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
         ListHeaderComponent={
           <>
-            <ThemedText variant="headlineMedium" style={styles.welcome}>
-              {`Welcome to C'Meet It, ${user?.displayName ?? 'CMITer'}!`}
-            </ThemedText>
+            <Text variant="headlineSmall" style={[{ color: colors.primary }, styles.welcome]}>
+              C'Meet It, 
+              <Text style={{color: colors.tertiary}}>{` ${user?.displayName ?? 'CMITer'} 🙌`}</Text>
+            </Text>
             {goals.length === 0 && (
-              <ThemedText variant="bodyLarge" style={styles.noGoalsText}>
+              <Text variant="bodyLarge" style={styles.noGoalsText}>
                 No goals yet. Let's set one and c'meet it!
-              </ThemedText>
+              </Text>
             )}
           </>
         }
@@ -161,48 +160,50 @@ export default function Home() {
           };
 
           return (
-            <ThemedCard
-              style={styles.goalContainer}
+            <Card
+              style={[{ backgroundColor: colors.surfaceContainer }, styles.goalContainer]}
               onLongPress={() => router.push(`/goal/detail/${item.id}`)}
             >
-              <View style={styles.goalHeader}>
-                <View style={{ flex: 1 }}>
-                  <ThemedText style={styles.goalTitle}>{item.title}</ThemedText>
-                  <ThemedText variant="bodySmall">
-                    <ThemedText style={{ color: colors.secondary }}>${item.commitmentAmount}</ThemedText>
-                    <ThemedText style={{ color: colors.tertiary }}> | </ThemedText>
-                    Due: {item.endDate}
-                    <ThemedText style={{ color: colors.tertiary }}> | </ThemedText>
-                    {remainingCheckIns} check-ins left
-                  </ThemedText>
+              <Card.Content>
+                <View style={styles.goalHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text variant='titleMedium' style={styles.goalTitle}>{item.title}</Text>
+                    <Text variant="bodySmall">
+                      <Text style={{ color: colors.tertiary }}>${item.commitmentAmount}</Text>
+                      <Text style={{ color: colors.onSurfaceVariant }}> | </Text>
+                      Due: {item.endDate}
+                      <Text style={{ color: colors.onSurfaceVariant }}> | </Text>
+                      {remainingCheckIns} check-ins left
+                    </Text>
+                  </View>
+                  <IconButton
+                    icon="dots-vertical"
+                    iconColor={colors.secondary}
+                    onPress={() => router.push(`/goal/detail/${item.id}`)}
+                  />
                 </View>
-                <IconButton
-                  icon="dots-vertical"
-                  onPress={() => router.push(`/goal/detail/${item.id}`)}
-                  iconColor={colors.primary}
+                <Text>Status: 
+                  <Text style={{ color: item.status === 'failed' ? colors.error : colors.onSurface }}> {item.status}</Text>
+                </Text>
+                <ProgressBar
+                  progress={item.checkIns.length / item.targetDays}
+                  color={
+                    item.status === 'failed' || (item.status === 'active' && daysLeft < remainingCheckIns)
+                      ? colors.error
+                      : colors.primary
+                  }
+                  style={[{}, styles.progressBar]}
                 />
-              </View>
-              <ThemedText>Status: {item.status}</ThemedText>
-              <ProgressBar
-                progress={item.checkIns.length / item.targetDays}
-                color={
-                  item.status === 'failed' || (item.status === 'active' && daysLeft < remainingCheckIns)
-                    ? colors.error
-                    : colors.primary
-                }
-                style={[{ backgroundColor: colors.background }, styles.progressBar]}
-              />
-              <Button
-                mode={'outlined'}
-                disabled={disabled}
-                onPress={handleActionPress}
-                textColor={colors.secondary}
-                style={styles.checkInButton}
-                theme={{ colors: { outline: colors.secondary } }}
-              >
-                {label}
-              </Button>
-            </ThemedCard>
+                <Button
+                  mode={'contained'}
+                  disabled={disabled}
+                  onPress={handleActionPress}
+                  style={styles.checkInButton}
+                >
+                  {label}
+                </Button>
+              </Card.Content>
+            </Card>
           );
         }}
       />
@@ -225,11 +226,11 @@ export default function Home() {
 
       <Snackbar
         visible={showSnackbar}
-        style={{ backgroundColor: colors.surface }}
+        style={{ backgroundColor: colors.surfaceContainer }}
         theme={{ colors: { inverseOnSurface: colors.error } }}
         onDismiss={() => setShowSnackbar(false)}
         duration={3000}
-        action={{ label: 'OK', textColor: colors.primary, onPress: () => { } }}
+        action={{ label: 'OK', onPress: () => { } }}
       >
         You either have unpaid goals or too many ongoing goals.
       </Snackbar>
@@ -246,6 +247,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 3,
   },
+  goalTitle: {
+    marginBottom: 2,
+  },
   progressBar: {
     height: 10,
     borderRadius: 5,
@@ -257,10 +261,6 @@ const styles = StyleSheet.create({
   createButton: {
     marginVertical: 10,
     paddingVertical: 10,
-  },
-  goalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
   },
   goalHeader: {
     flexDirection: 'row',

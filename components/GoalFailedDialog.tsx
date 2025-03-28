@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { ThemedText } from './ThemedText';
-import { ThemedButton } from './ThemedButton';
-import { Dialog, Portal, Button, useTheme } from 'react-native-paper';
+import { Dialog, Portal, Button, Text, useTheme } from 'react-native-paper';
 
 type Props = {
   visible: boolean;
@@ -21,20 +19,20 @@ export default function GoalFailedDialog({ visible, onDismiss, onSettleUp, goalT
     <Dialog
       visible={visible}
       onDismiss={onDismiss}
-      style={[{ backgroundColor: colors.surface }, styles.dialog]}>
+      style={[{ }, styles.dialog]}>
       <Dialog.Title style={{ color: colors.error }}>Goal Failed</Dialog.Title>
       <Dialog.Content>
-        <ThemedText>
-        Your goal <ThemedText style={{ fontWeight: 'bold' }}>{goalTitle}</ThemedText> with a commitment of
-        <ThemedText style={{ fontWeight: 'bold', color: colors.secondary }}> ${commitmentAmount} </ThemedText>
-        due on <ThemedText style={{ fontWeight: 'bold' }}>{endDate}</ThemedText> has failed and needs to be settled before creating new goals.
-        </ThemedText>
+        <Text>
+        Your goal <Text style={{ fontWeight: 'bold' }}>{goalTitle}</Text> with a commitment of
+        <Text style={{ fontWeight: 'bold', color: colors.tertiary }}> ${commitmentAmount} </Text>
+        due on <Text style={{ fontWeight: 'bold' }}>{endDate}</Text> has failed and needs to be settled before creating new goals.
+        </Text>
       </Dialog.Content>
       <Dialog.Actions>
-        <ThemedButton mode='text' onPress={onDismiss}>Later</ThemedButton>
-        <ThemedButton mode='text' onPress={onSettleUp} textColor={colors.secondary}>
+        <Button mode='text' onPress={onDismiss} textColor={colors.secondary}>Later</Button>
+        <Button mode='text' onPress={onSettleUp}>
         Settle Up
-        </ThemedButton>
+        </Button>
       </Dialog.Actions>
     </Dialog>
     </Portal>

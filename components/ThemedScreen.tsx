@@ -12,7 +12,7 @@ export const ThemedScreen = ({ children, padded = true, style }: Props) => {
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.container, padded && styles.padded, { backgroundColor: colors.background }, style]}>
+    <View style={[styles.container, padded && styles.padded, {backgroundColor: colors.surface}, style]}>
       {children}
     </View>
   );
@@ -24,6 +24,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   padded: {
-    padding: 20,
+    paddingTop: 10,
+    paddingRight: 20,
+    paddingBottom: 0,
+    paddingLeft: 20,
   },
 });

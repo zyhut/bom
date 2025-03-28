@@ -1,11 +1,11 @@
 import React from 'react';
-import { ThemedText } from '../../components/ThemedText';
+import { Text } from 'react-native-paper';
 import { ThemedScreen } from '../../components/ThemedScreen';
 
 export default function MoreScreen() {
     return (
         <ThemedScreen>
-            <ThemedText variant="titleLarge">More</ThemedText>
+            <Text variant="titleLarge">More</Text>
         </ThemedScreen>
     );
 }

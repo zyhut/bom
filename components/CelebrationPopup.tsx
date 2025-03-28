@@ -1,8 +1,7 @@
 // components/CelebrationPopup.tsx
 import React from 'react';
-import { Dialog, Portal, useTheme } from 'react-native-paper';
+import { Dialog, Text, Portal, useTheme } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
-import { ThemedText } from './ThemedText';
 
 const CelebrationPopup = ({
   visible,
@@ -20,7 +19,6 @@ const CelebrationPopup = ({
       <Dialog
         visible={visible}
         onDismiss={onDismiss}
-        style={{ backgroundColor: colors.surface }}
     >
         <Dialog.Content style={{ alignItems: 'center' }}>
           <LottieView
@@ -29,9 +27,9 @@ const CelebrationPopup = ({
             loop={false}
             style={{ width: 150, height: 150 }}
           />
-          <ThemedText variant="titleMedium" style={{ marginTop: 10, textAlign: 'center' }}>
+          <Text variant="titleMedium" style={{ marginTop: 10, textAlign: 'center' }}>
             {title}
-          </ThemedText>
+          </Text>
         </Dialog.Content>
       </Dialog>
     </Portal>

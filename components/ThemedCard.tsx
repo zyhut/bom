@@ -9,7 +9,7 @@ export const ThemedCard = ({ children, style, ...props }: Props) => {
 
   return (
     <Card
-      style={[{ backgroundColor: colors.surface, borderRadius: 12 }, style]}
+      style={[{ borderRadius: 12 }, style]}
       {...props}
     >
       {children}

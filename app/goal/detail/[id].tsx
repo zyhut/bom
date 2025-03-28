@@ -2,14 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Button, ProgressBar, IconButton, useTheme } from 'react-native-paper';
+import { Button, ProgressBar, IconButton, Card, Text, useTheme } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
 import { format, parseISO, isWithinInterval, subDays, differenceInCalendarDays } from 'date-fns';
 import { useGoals } from '../../../store/GoalProvider';
 import { Goal } from '../../../types/Goal';
 import { canDeleteGoal, shouldAutoFailGoal } from '../../../services/goalUtils';
-import { ThemedText } from '../../../components/ThemedText';
-import { ThemedCard } from '../../../components/ThemedCard';
 import { ThemedScreen } from '../../../components/ThemedScreen';
 import { getGoalActionMeta } from '../../../utils/goalActionUtils';
 import CelebrationPopup from '../../../components/CelebrationPopup';
@@ -91,10 +89,9 @@ const GoalDetailScreen = () => {
 
     const markedDates = goal.checkIns.reduce((acc, date) => {
       acc[date] = {
-        marked: true,
+        marked: false,
         selected: true,
-        selectedColor: colors.primary,
-        dotColor: colors.primary,
+        selectedColor: colors.secondaryContainer,
       };
       return acc;
     }, {} as Record<string, any>);
@@ -126,26 +123,27 @@ const GoalDetailScreen = () => {
             handleBackfill(dateString);
           }
         }}
-        style={{ backgroundColor: colors.surface, borderRadius: 8 }}
+        style={{ backgroundColor: colors.surfaceContainer, borderRadius: 8 }}
         theme={{
-          backgroundColor: colors.surface,
-          calendarBackground: colors.surface,
-          selectedDayBackgroundColor: colors.primary,
-          selectedDayTextColor: colors.onPrimary,
+          backgroundColor: colors.surfaceContainer,
+          calendarBackground: colors.surfaceContainer,
+          selectedDayBackgroundColor: colors.secondaryContainer,
+          selectedDayTextColor: colors.onSecondaryContainer,
           todayTextColor: colors.primary,
           dotColor: colors.secondary,
-          arrowColor: colors.primary,
+          arrowColor: colors.secondary,
           indicatorColor: colors.secondary,
-          textSectionTitleColor: colors.primary,
-          dayTextColor: colors.primary,
-          monthTextColor: colors.primary,
+          textSectionTitleColor: colors.onSurface,
+          dayTextColor: colors.onSurface,
+          monthTextColor: colors.onSurface,
           textDisabledColor: colors.surfaceDisabled,
+          week: { backgroundColor: colors.primary },
         }}
       />
     );
   };
 
-  if (!goal) return <ThemedText variant="bodyLarge">Goal not found.</ThemedText>;
+  if (!goal) return <Text variant="bodyLarge">Goal not found.</Text>;
 
   const remainingCheckIns = goal.targetDays - goal.checkIns.length;
   const remainingDays = differenceInCalendarDays(parseISO(goal.endDate), new Date());
@@ -155,39 +153,37 @@ const GoalDetailScreen = () => {
   return (
     <ThemedScreen>
       <ScrollView contentContainerStyle={styles.container}>
-        <ThemedCard style={styles.card}>
+        <Card style={[{ backgroundColor: colors.surfaceContainer }, styles.card]}>
           <View style={styles.header}>
-            <ThemedText variant="headlineMedium">{goal.title}</ThemedText>
+            <Text variant="headlineMedium">{goal.title}</Text>
             {canDeleteGoal(goal) && (
               <IconButton icon="delete-outline" onPress={handleDeleteGoal} accessibilityLabel="Delete Goal" />
             )}
           </View>
 
-          <ThemedText variant="bodyMedium">Description: {goal.description || 'No description provided'}</ThemedText>
-          <ThemedText variant="bodyMedium">Start: {goal.startDate}</ThemedText>
-          <ThemedText variant="bodyMedium">End: {goal.endDate}</ThemedText>
-          <ThemedText variant="bodyMedium">Target Days: {goal.targetDays}</ThemedText>
-          <ThemedText variant="bodyMedium">Remaining Check-Ins: {remainingCheckIns}</ThemedText>
-          <ThemedText variant="bodyMedium">Commitment: ${goal.commitmentAmount}</ThemedText>
-          <ThemedText variant="bodyMedium">Status: {goal.status}</ThemedText>
+          <Text variant="bodyMedium">Description: {goal.description || 'No description provided'}</Text>
+          <Text variant="bodyMedium">Start: {goal.startDate}</Text>
+          <Text variant="bodyMedium">End: {goal.endDate}</Text>
+          <Text variant="bodyMedium">Target Days: {goal.targetDays}</Text>
+          <Text variant="bodyMedium">Remaining Check-Ins: {remainingCheckIns}</Text>
+          <Text variant="bodyMedium">Commitment: <Text style={{ color: colors.tertiary }}>${goal.commitmentAmount}</Text></Text>
+          <Text variant="bodyMedium">Status: <Text variant="bodyMedium" style={{ color: goal.status === 'failed' ? colors.error : colors.onSurface }}>{goal.status}</Text></Text>
 
           <ProgressBar
             progress={goal.checkIns.length / goal.targetDays}
-            style={[{ backgroundColor: colors.background }, styles.progressBar]}
+            style={[{ }, styles.progressBar]}
             color={
               goal.status === 'failed' || remainingDays < remainingCheckIns
                 ? colors.error
                 : colors.primary
             }
           />
-          <ThemedText variant="labelSmall" style={styles.progressText}>
+          <Text variant="labelSmall" style={styles.progressText}>
             {goal.checkIns.length}/{goal.targetDays} Check-Ins
-          </ThemedText>
+          </Text>
 
-          <Button mode="outlined"
+          <Button mode="contained"
             disabled={actionDisabled}
-            textColor={colors.secondary}
-            theme={{ colors: { outline: colors.secondary } }}
             onPress={handlePrimaryAction}
             style={styles.checkInButton}>
             {actionLabel}
@@ -203,16 +199,16 @@ const GoalDetailScreen = () => {
               Mark as Failed
             </Button>
           )}
-        </ThemedCard>
+        </Card>
 
-        <ThemedCard style={styles.card}>
-          <ThemedText variant="titleMedium" style={styles.subheader}>Check-In Calendar</ThemedText>
-          <ThemedText variant="bodySmall" style={{ color: colors.secondary, marginBottom: 10 }}>
+        <Card style={[{ backgroundColor: colors.surfaceContainer }, styles.card]}>
+          <Text variant="titleMedium" style={styles.subheader}>Check-In Calendar</Text>
+          <Text variant="bodySmall" style={{ color: colors.primary, marginBottom: 10 }}>
             📅 Tap a past date (within the last 3 days) to backfill a missed check-in.
-          </ThemedText>
+          </Text>
           {renderCalendar()}
-        </ThemedCard>
-        <Button mode="text" onPress={() => router.replace('/')} style={{ marginBottom: 10 }}>
+        </Card>
+        <Button mode="text" textColor={ colors.secondary } onPress={() => router.replace('/')} style={{ marginBottom: 10 }}>
           Back to Home
         </Button>
       </ScrollView>

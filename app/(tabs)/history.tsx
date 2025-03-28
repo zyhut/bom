@@ -1,11 +1,11 @@
 import React from 'react';
+import { Text } from 'react-native-paper';
 import { ThemedScreen } from '../../components/ThemedScreen';
-import { ThemedText } from '../../components/ThemedText';
 
 export default function HistoryScreen() {
   return (
     <ThemedScreen>
-      <ThemedText variant="titleLarge">History</ThemedText>
+      <Text variant="titleLarge">History</Text>
     </ThemedScreen>
   );
 }

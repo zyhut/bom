@@ -11,7 +11,7 @@ export default function TabLayout() {
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
-                    backgroundColor: colors.surface,
+                    backgroundColor: colors.surfaceContainer,
                     borderTopWidth: 0,
                     elevation: 8,
                     height: 60, // slightly smaller height
@@ -21,16 +21,19 @@ export default function TabLayout() {
                     fontSize: 12,
                     fontWeight: '600',
                 },
+                tabBarIconStyle: {
+                },
+                tabBarItemStyle: {
+                },
                 tabBarActiveTintColor: colors.primary,
-                tabBarInactiveTintColor: colors.tertiary,
             }}
         >
             <Tabs.Screen
                 name="index"
                 options={{
                     title: 'Home',
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="home" color={color} size={size} />
+                    tabBarIcon: ({ focused, color, size }) => (
+                        <MaterialCommunityIcons name={focused ? "home" : "home-outline"} color={color} size={size} />
                     ),
                 }}
             />
@@ -38,8 +41,8 @@ export default function TabLayout() {
                 name="create"
                 options={{
                     title: 'Goal',
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="plus-box" color={color} size={size} />
+                    tabBarIcon: ({ focused, color, size }) => (
+                        <MaterialCommunityIcons name={focused ? "plus-box" : "plus-thick"} color={color} size={size} />
                     ),
                 }}
             />
@@ -47,8 +50,8 @@ export default function TabLayout() {
                 name="history"
                 options={{
                     title: 'History',
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="history" color={color} size={size} />
+                    tabBarIcon: ({ focused, color, size }) => (
+                        <MaterialCommunityIcons name={focused ? "clock-time-four" : "history"} color={color} size={size} />
                     ),
                 }}
             />
@@ -56,8 +59,8 @@ export default function TabLayout() {
                 name="more"
                 options={{
                     title: 'More',
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="dots-horizontal" color={color} size={size} />
+                    tabBarIcon: ({ focused, color, size }) => (
+                        <MaterialCommunityIcons name={focused ? "dots-horizontal-circle" : "dots-horizontal"} color={color} size={size} />
                     ),
                 }}
             />

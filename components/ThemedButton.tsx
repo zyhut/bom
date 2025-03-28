@@ -18,7 +18,7 @@ export const ThemedButton = ({ children, onPress, mode, textColor, theme, style 
   return (
     <Button
       mode={mode || 'outlined'}
-      textColor={textColor || colors.primary}
+      textColor={ textColor }
       style={[{ borderRadius: 8 }, style]}
       theme={theme}
       onPress={onPress}

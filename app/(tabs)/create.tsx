@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Platform, Pressable, ScrollView, Animated } from 'react-native';
+import { View, StyleSheet, Pressable, ScrollView, Animated, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useGoals } from '../../store/GoalProvider';
 import { useStore } from '../../store/useStore';
 import { Goal } from '../../types/Goal';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Switch, useTheme, IconButton, Text as PaperText, Button } from 'react-native-paper';
-import { ThemedText } from '../../components/ThemedText';
-import { ThemedButton } from '../../components/ThemedButton';
-import { ThemedCard } from '../../components/ThemedCard';
-import { ThemedInput } from '../../components/ThemedInput';
+import { Switch, useTheme, IconButton, Text, TextInput, Card, Button } from 'react-native-paper';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { ThemedScreen } from '../../components/ThemedScreen';
 
@@ -17,6 +13,7 @@ const CreateGoalScreen = () => {
   const { createGoal } = useGoals();
   const user = useStore((state) => state.user);
   const router = useRouter();
+  const colorScheme = useColorScheme();
   const { colors } = useTheme();
 
   const [title, setTitle] = useState('');
@@ -116,19 +113,19 @@ const CreateGoalScreen = () => {
     return (
       <Tooltip
         isVisible={visible}
-        content={<ThemedText style={[{ color: colors.primary, backgroundColor: colors.background }, styles.tooltipText]}>{message}</ThemedText>}
+        content={<Text style={[{ backgroundColor: colors.surfaceVariant, color: colors.onSurfaceVariant }, styles.tooltipText]}>{message}</Text>}
         placement="top"
         backgroundColor="transparent"
         onClose={() => setVisible(false)}
         contentStyle={styles.tooltip}
-        arrowStyle={{ borderTopColor: colors.background }}
+        arrowStyle={{ borderTopColor: colors.surfaceVariant }}
       >
         <IconButton
           icon="help-circle-outline"
           onPress={() => setVisible(true)}
           size={18}
           style={styles.helpIcon}
-          iconColor={colors.tertiary}
+          iconColor={colors.onSurfaceVariant}
         />
       </Tooltip>
     );
@@ -137,13 +134,14 @@ const CreateGoalScreen = () => {
   return (
     <ThemedScreen>
       <ScrollView contentContainerStyle={styles.container}>
-        <ThemedCard style={styles.card}>
-          <ThemedText variant="headlineMedium" style={styles.header}>Create a New Goal</ThemedText>
+        <Card style={[{ backgroundColor: colors.surfaceContainer }, styles.card]}>
+          <Text variant="headlineMedium" style={styles.header}>Create a New Goal</Text>
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <ThemedInput
+              <TextInput
                 label="Goal Title"
+                mode="outlined"
                 value={title}
                 onChangeText={setTitle}
                 style={[{ backgroundColor: colors.surface }, styles.input]}
@@ -151,7 +149,7 @@ const CreateGoalScreen = () => {
               />
               {titleError !== '' && (
                 <Animated.View style={{ opacity: titleAnim }}>
-                  <PaperText style={{ color: colors.error }}>{titleError}</PaperText>
+                  <Text style={{ color: colors.error }}>{titleError}</Text>
                 </Animated.View>
               )}
             </View>
@@ -159,18 +157,18 @@ const CreateGoalScreen = () => {
           </View>
 
           <View style={styles.row}>
-            <ThemedInput label="Description (optional)" value={description} onChangeText={setDescription} multiline style={[{ backgroundColor: colors.surface }, styles.input]} />
+            <TextInput label="Description (optional)" mode="outlined" value={description} onChangeText={setDescription} multiline style={[{ backgroundColor: colors.surface }, styles.input]} />
             <HelpTip message="Add more detail about your goal if you'd like" />
           </View>
 
           <View style={styles.row}>
             <View style={styles.commitmentContainer}>
-              <PaperText>Standard</PaperText>
+              <Text>Standard</Text>
               <Switch
                 value={commitmentType === 'committed'}
                 onValueChange={(value) => setCommitmentType(value ? 'committed' : 'standard')}
               />
-              <PaperText>Committed</PaperText>
+              <Text>Committed</Text>
             </View>
             <HelpTip message="Committed goals involve a commitment amount you’ll need to settle if the goal isn’t completed. Standard goals have no financial commitment." />
           </View>
@@ -178,8 +176,9 @@ const CreateGoalScreen = () => {
           {commitmentType === 'committed' && (
             <View style={styles.row}>
               <View style={{ flex: 1 }}>
-                <ThemedInput
+                <TextInput
                   label="Commitment Amount (Min $3, Max $500)"
+                  mode="outlined"
                   keyboardType="numeric"
                   value={commitmentAmount}
                   onChangeText={setCommitmentAmount}
@@ -188,7 +187,7 @@ const CreateGoalScreen = () => {
                 />
                 {commitmentError !== '' && (
                   <Animated.View style={{ opacity: commitmentAnim }}>
-                    <PaperText style={{ color: colors.error }}>{commitmentError}</PaperText>
+                    <Text style={{ color: colors.error }}>{commitmentError}</Text>
                   </Animated.View>
                 )}
               </View>
@@ -196,9 +195,9 @@ const CreateGoalScreen = () => {
             </View>
           )}
 
-          <ThemedText style={styles.label}>Start Date</ThemedText>
+          <Text style={styles.label}>Start Date</Text>
           <Pressable onPress={() => setShowStartDatePicker(true)} style={styles.dateButton}>
-            <ThemedText>{formatDate(startDate)}</ThemedText>
+            <Text>{formatDate(startDate)}</Text>
           </Pressable>
           {showStartDatePicker && (
             <DateTimePicker
@@ -214,13 +213,13 @@ const CreateGoalScreen = () => {
           )}
           {startDateError !== '' && (
             <Animated.View style={{ opacity: startDateAnim }}>
-              <PaperText style={{ color: colors.error }}>{startDateError}</PaperText>
+              <Text style={{ color: colors.error }}>{startDateError}</Text>
             </Animated.View>
           )}
 
-          <ThemedText style={styles.label}>End Date</ThemedText>
+          <Text style={styles.label}>End Date</Text>
           <Pressable onPress={() => setShowEndDatePicker(true)} style={styles.dateButton}>
-            <ThemedText>{formatDate(endDate)}</ThemedText>
+            <Text>{formatDate(endDate)}</Text>
           </Pressable>
           {showEndDatePicker && (
             <DateTimePicker
@@ -236,14 +235,15 @@ const CreateGoalScreen = () => {
           )}
           {endDateError !== '' && (
             <Animated.View style={{ opacity: endDateAnim }}>
-              <PaperText style={{ color: colors.error }}>{endDateError}</PaperText>
+              <Text style={{ color: colors.error }}>{endDateError}</Text>
             </Animated.View>
           )}
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <ThemedInput
+              <TextInput
                 label="Target Days"
+                mode="outlined"
                 value={targetDays}
                 onChangeText={setTargetDays}
                 keyboardType="numeric"
@@ -252,20 +252,17 @@ const CreateGoalScreen = () => {
               />
               {targetDaysError !== '' && (
                 <Animated.View style={{ opacity: targetDaysAnim }}>
-                  <PaperText style={{ color: colors.error }}>{targetDaysError}</PaperText>
+                  <Text style={{ color: colors.error }}>{targetDaysError}</Text>
                 </Animated.View>
               )}
             </View>
             <HelpTip message="The number of days you aim to check in. You can leave room for cheat days!" />
           </View>
 
-          <ThemedButton mode="outlined" onPress={handleCreate} style={styles.createButton}>
+          <Button mode="contained" onPress={handleCreate} style={styles.createButton}>
             Create Goal
-          </ThemedButton>
-        </ThemedCard>
-        <Button mode="text" onPress={() => router.replace('/')} style={{ margin: 20 }}>
-          Back to Home
-        </Button>
+          </Button>
+        </Card>
       </ScrollView>
     </ThemedScreen>
   );

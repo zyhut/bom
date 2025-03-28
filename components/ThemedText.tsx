@@ -16,7 +16,7 @@ export const ThemedText = ({ children, style, variant, color, ...props }: Props)
   return (
     <Text
       variant={variant}
-      style={[{ color: color || colors.primary }, style]}
+      style={[{ color: color }, style]}
       {...props}
     >
       {children}
