@@ -125,10 +125,9 @@ export default function Home() {
         contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
         ListHeaderComponent={
           <>
-            <Text variant="headlineSmall" style={[{ color: colors.tertiary }, styles.welcome]}>
-              {`${user?.displayName ?? 'CMITer'}, `}
-              <Text style={{color: colors.primary}}>C'Meet It!</Text>
-            </Text>
+            <Text variant="headlineSmall" style={[{ color: colors.primary }, styles.appName]}>C'Meet It!</Text>
+            <Text variant="titleMedium" style={styles.welcome}>{`Welcome, ${user?.displayName ?? 'CMITer'}`}</Text>
+
             {goals.length === 0 && (
               <Text variant="bodyLarge" style={styles.noGoalsText}>
                 No goals yet. Let's set one and c'meet it!
@@ -239,7 +238,8 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  welcome: { marginBottom: 20, textAlign: 'center' },
+  appName: { marginBottom: 5, textAlign: 'center' },
+  welcome: { marginBottom: 5, textAlign: 'center' },
   noGoalsText: { marginVertical: 20, textAlign: 'center' },
   goalContainer: {
     padding: 15,
