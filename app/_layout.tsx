@@ -6,6 +6,9 @@ import { StripeProvider } from '@stripe/stripe-react-native';
 import { STRIPE_PUBLIC_KEY } from '../services/keys';
 import { useColorScheme, SafeAreaView } from 'react-native';
 import { lightTheme, darkTheme } from '../theme/theme';
+import { registerTranslation, en } from 'react-native-paper-dates';
+
+registerTranslation('en', en);
 
 export default function Layout() {
   const colorScheme = useColorScheme();

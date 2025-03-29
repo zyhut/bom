@@ -107,7 +107,7 @@ export default function Home() {
   if (!appReady || goalsLoading) {
     return (
       <ThemedScreen>
-        <ProgressBar indeterminate color="#1E3A8A" />
+        <ProgressBar indeterminate color={colors.primary} />
         <Text variant="labelLarge" style={styles.loadingText}>
           Loading goals...
         </Text>
@@ -188,7 +188,7 @@ export default function Home() {
                 <ProgressBar
                   progress={item.checkIns.length / item.targetDays}
                   color={
-                    item.status === 'failed' || (item.status === 'active' && daysLeft < remainingCheckIns)
+                    item.status === 'failed'/* || (item.status === 'active' && daysLeft < remainingCheckIns)*/
                       ? colors.error
                       : colors.primary
                   }

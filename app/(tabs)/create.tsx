@@ -1,10 +1,12 @@
+// create.tsx
+
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Pressable, ScrollView, Animated, useColorScheme } from 'react-native';
+import { View, StyleSheet, ScrollView, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useGoals } from '../../store/GoalProvider';
 import { useStore } from '../../store/useStore';
 import { Goal } from '../../types/Goal';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { DatePickerModal } from 'react-native-paper-dates';
 import { Switch, useTheme, IconButton, Text, TextInput, Card, Button } from 'react-native-paper';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { ThemedScreen } from '../../components/ThemedScreen';
@@ -13,37 +15,41 @@ const CreateGoalScreen = () => {
   const { createGoal } = useGoals();
   const user = useStore((state) => state.user);
   const router = useRouter();
-  const colorScheme = useColorScheme();
   const { colors } = useTheme();
+
+  const cleanDate = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const today = cleanDate(new Date());
+  const maxStartDate = new Date(today.getTime() + 14 * 86400000);
+  const maxEndDate = new Date(today.getTime() + 365 * 86400000);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [commitmentType, setCommitmentType] = useState<'standard' | 'committed'>('committed');
   const [commitmentAmount, setCommitmentAmount] = useState('');
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 7 * 86400000));
-  const [targetDays, setTargetDays] = useState(`${Math.floor((endDate.getTime() - startDate.getTime()) / 86400000)}`);
+
+  const [range, setRange] = useState<{ startDate: Date | undefined; endDate: Date | undefined }>({
+    startDate: today,
+    endDate: new Date(today.getTime() + 30 * 86400000),
+  });
+  const [targetDays, setTargetDays] = useState('1');
+  const [open, setOpen] = useState(false);
 
   const [titleError, setTitleError] = useState('');
   const [commitmentError, setCommitmentError] = useState('');
-  const [startDateError, setStartDateError] = useState('');
-  const [endDateError, setEndDateError] = useState('');
+  const [dateError, setDateError] = useState('');
   const [targetDaysError, setTargetDaysError] = useState('');
+
   const [titleAnim] = useState(new Animated.Value(0));
   const [commitmentAnim] = useState(new Animated.Value(0));
-  const [startDateAnim] = useState(new Animated.Value(0));
-  const [endDateAnim] = useState(new Animated.Value(0));
+  const [dateAnim] = useState(new Animated.Value(0));
   const [targetDaysAnim] = useState(new Animated.Value(0));
 
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-
-  const formatDate = (date: Date) => date.toISOString().split('T')[0];
-
   useEffect(() => {
-    const days = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000);
-    setTargetDays(days.toString());
-  }, [startDate, endDate]);
+    if (range.startDate && range.endDate) {
+      const days = Math.floor((range.endDate.getTime() - range.startDate.getTime()) / 86400000) + 1;
+      setTargetDays(days.toString());
+    }
+  }, [range]);
 
   const validateAndAnimate = (condition: boolean, setError: any, anim: Animated.Value, message: string) => {
     if (condition) {
@@ -58,42 +64,39 @@ const CreateGoalScreen = () => {
   };
 
   const handleCreate = async () => {
-    const today = new Date();
-    const maxStartDate = new Date(today.getTime() + 14 * 86400000);
-    const minEndDate = new Date(startDate.getTime() + 7 * 86400000);
-    const maxEndDate = new Date(startDate.getTime() + 365 * 86400000);
-    const maxTargetDays = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000);
+    const maxTargetDays = range.startDate && range.endDate
+      ? Math.floor((range.endDate.getTime() - range.startDate.getTime()) / 86400000) + 1
+      : 0;
     const targetDaysNum = Number(targetDays);
+
     const isTitleValid = validateAndAnimate(!title, setTitleError, titleAnim, 'Goal title is required.');
     const isCommitmentValid = commitmentType === 'committed'
       ? validateAndAnimate(isNaN(Number(commitmentAmount)) || Number(commitmentAmount) < 3 || Number(commitmentAmount) > 500,
         setCommitmentError, commitmentAnim, 'Amount must be $3 to $500')
       : true;
-    const isStartValid = validateAndAnimate(
-      formatDate(startDate) < formatDate(today) || startDate > maxStartDate,
-      setStartDateError,
-      startDateAnim,
-      'Start date must be within the next 14 days.'
-    );
-    const isEndValid = validateAndAnimate(
-      endDate <= startDate || endDate < minEndDate || endDate > maxEndDate,
-      setEndDateError,
-      endDateAnim,
-      'End date must be 1 week after start date and within 1 year.'
+    const isDateValid = validateAndAnimate(
+      !range.startDate || !range.endDate ||
+      range.startDate < today ||
+      range.startDate > maxStartDate ||
+      range.endDate < range.startDate ||
+      range.endDate > maxEndDate,
+      setDateError,
+      dateAnim,
+      'Start must be within 14 days. End must not be before start and must be within 1 year.'
     );
     const isTargetDaysValid = validateAndAnimate(
       isNaN(targetDaysNum) || targetDaysNum < 1 || targetDaysNum > maxTargetDays,
       setTargetDaysError,
       targetDaysAnim,
-      `Target days must be a number between 1 and ${maxTargetDays}.`
+      `Target days must be between 1 and ${maxTargetDays}.`
     );
 
-    if (isTitleValid && isCommitmentValid && isStartValid && isEndValid && isTargetDaysValid) {
+    if (isTitleValid && isCommitmentValid && isDateValid && isTargetDaysValid) {
       const newGoal: Omit<Goal, 'id'> = {
         title,
         description,
-        startDate: formatDate(startDate),
-        endDate: formatDate(endDate),
+        startDate: range.startDate!.toISOString().split('T')[0],
+        endDate: range.endDate!.toISOString().split('T')[0],
         targetDays: targetDaysNum,
         checkIns: [],
         userId: user!.uid,
@@ -157,7 +160,14 @@ const CreateGoalScreen = () => {
           </View>
 
           <View style={styles.row}>
-            <TextInput label="Description (optional)" mode="outlined" value={description} onChangeText={setDescription} multiline style={[{ backgroundColor: colors.surface }, styles.input]} />
+            <TextInput
+              label="Description (optional)"
+              mode="outlined"
+              value={description}
+              onChangeText={setDescription}
+              multiline
+              style={[{ backgroundColor: colors.surface }, styles.input]}
+            />
             <HelpTip message="Add more detail about your goal if you'd like" />
           </View>
 
@@ -170,7 +180,7 @@ const CreateGoalScreen = () => {
               />
               <Text>Committed</Text>
             </View>
-            <HelpTip message="Committed goals involve a commitment amount you’ll need to settle if the goal isn’t completed. Standard goals have no financial commitment." />
+            <HelpTip message="Committed goals involve a commitment amount. Standard goals don’t." />
           </View>
 
           {commitmentType === 'committed' && (
@@ -191,76 +201,60 @@ const CreateGoalScreen = () => {
                   </Animated.View>
                 )}
               </View>
-              <HelpTip message="This is your commitment amount — the value you’ll need to settle if the goal isn’t completed. e.g. $20" />
+              <HelpTip message="This is your commitment amount — what you’ll need to settle if the goal isn’t completed." />
             </View>
           )}
 
-          <Text style={styles.label}>Start Date</Text>
-          <Pressable onPress={() => setShowStartDatePicker(true)} style={styles.dateButton}>
-            <Text>{formatDate(startDate)}</Text>
-          </Pressable>
-          {showStartDatePicker && (
-            <DateTimePicker
-              value={startDate}
-              mode="date"
-              display="default"
-              accentColor={colors.primary}
-              onChange={(_, date) => {
-                setShowStartDatePicker(false);
-                if (date) setStartDate(date);
+          <View style={{ borderWidth: 1, borderColor: colors.outlineVariant, borderRadius: 8, padding: 12, marginBottom: 16 }}>
+            <Button mode="outlined" icon="calendar-month" onPress={() => setOpen(true)} style={{ marginBottom: 8 }}>
+              Select Start and End Dates
+            </Button>
+            <Text variant="labelLarge" style={{ paddingBottom: 8 }}>
+              Start: {range.startDate?.toISOString().split('T')[0]} | End: {range.endDate?.toISOString().split('T')[0]}
+            </Text>
+            {dateError !== '' && (
+              <Animated.View style={{ opacity: dateAnim }}>
+                <Text style={{ color: colors.error }}>{dateError}</Text>
+              </Animated.View>
+            )}
+            <DatePickerModal
+              locale="en"
+              mode="range"
+              visible={open}
+              onDismiss={() => setOpen(false)}
+              startDate={range.startDate}
+              endDate={range.endDate}
+              onConfirm={({ startDate, endDate }) => {
+                setOpen(false);
+                setRange({ startDate, endDate });
               }}
+              validRange={{ startDate: today, endDate: maxEndDate }}
+              saveLabel="Confirm"
             />
-          )}
-          {startDateError !== '' && (
-            <Animated.View style={{ opacity: startDateAnim }}>
-              <Text style={{ color: colors.error }}>{startDateError}</Text>
-            </Animated.View>
-          )}
 
-          <Text style={styles.label}>End Date</Text>
-          <Pressable onPress={() => setShowEndDatePicker(true)} style={styles.dateButton}>
-            <Text>{formatDate(endDate)}</Text>
-          </Pressable>
-          {showEndDatePicker && (
-            <DateTimePicker
-              value={endDate}
-              mode="date"
-              display="default"
-              accentColor={colors.primary}
-              onChange={(_, date) => {
-                setShowEndDatePicker(false);
-                if (date) setEndDate(date);
-              }}
-            />
-          )}
-          {endDateError !== '' && (
-            <Animated.View style={{ opacity: endDateAnim }}>
-              <Text style={{ color: colors.error }}>{endDateError}</Text>
-            </Animated.View>
-          )}
-
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <TextInput
-                label="Target Days"
-                mode="outlined"
-                value={targetDays}
-                onChangeText={setTargetDays}
-                keyboardType="numeric"
-                style={[{ backgroundColor: colors.surface }, styles.input]}
-                error={!!targetDaysError}
-              />
-              {targetDaysError !== '' && (
-                <Animated.View style={{ opacity: targetDaysAnim }}>
-                  <Text style={{ color: colors.error }}>{targetDaysError}</Text>
-                </Animated.View>
-              )}
+            <View style={[styles.row, { marginTop: 16 }]}>
+              <View style={{ flex: 1 }}>
+                <TextInput
+                  label="Target Days"
+                  mode="outlined"
+                  value={targetDays}
+                  onChangeText={setTargetDays}
+                  keyboardType="numeric"
+                  style={[{ backgroundColor: colors.surface }, styles.input]}
+                  error={!!targetDaysError}
+                />
+                {targetDaysError !== '' && (
+                  <Animated.View style={{ opacity: targetDaysAnim }}>
+                    <Text style={{ color: colors.error }}>{targetDaysError}</Text>
+                  </Animated.View>
+                )}
+              </View>
+              <HelpTip message="The number of days you aim to check in. Feel free to leave room for cheat days!" />
             </View>
-            <HelpTip message="The number of days you aim to check in. You can leave room for cheat days!" />
           </View>
 
           <Button mode="contained" onPress={handleCreate} style={styles.createButton}>
-            Create Goal
+            C'Meet It!
           </Button>
         </Card>
       </ScrollView>
@@ -274,18 +268,7 @@ const styles = StyleSheet.create({
   header: { marginBottom: 16, textAlign: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   input: { flex: 1 },
-  label: { marginTop: 10, marginBottom: 5 },
-  dateButton: {
-    padding: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#CCC',
-    marginBottom: 12,
-    backgroundColor: '#F0F0F0',
-  },
-  commitmentContainer: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8,
-  },
+  commitmentContainer: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   helpIcon: { marginLeft: 6, marginTop: 4 },
   tooltip: { padding: 0, maxWidth: 320 },
   tooltipText: { padding: 10 },

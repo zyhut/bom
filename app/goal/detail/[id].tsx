@@ -173,7 +173,7 @@ const GoalDetailScreen = () => {
             progress={goal.checkIns.length / goal.targetDays}
             style={[{ }, styles.progressBar]}
             color={
-              goal.status === 'failed' || remainingDays < remainingCheckIns
+              goal.status === 'failed'/* || remainingDays < remainingCheckIns*/
                 ? colors.error
                 : colors.primary
             }
