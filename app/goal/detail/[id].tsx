@@ -146,7 +146,7 @@ const GoalDetailScreen = () => {
   if (!goal) return <Text variant="bodyLarge">Goal not found.</Text>;
 
   const remainingCheckIns = goal.targetDays - goal.checkIns.length;
-  const remainingDays = differenceInCalendarDays(parseISO(goal.endDate), new Date());
+  const remainingDays = differenceInCalendarDays(parseISO(goal.endDate), subDays(parseISO(today), 1));
   const { label: actionLabel, disabled: actionDisabled } = getGoalActionMeta(goal);
   const canBeFailedEarly = goal.status === 'active' && remainingDays < remainingCheckIns;
 
