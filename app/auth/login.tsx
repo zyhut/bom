@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import { Snackbar, Button, Divider, useTheme } from 'react-native-paper';
+import { Snackbar, Text, TextInput, Button, Divider, useTheme } from 'react-native-paper';
 import { logIn, signInWithGoogle } from '../../services/authService';
 import { useStore } from '../../store/useStore';
-import { ThemedInput } from '../../components/ThemedInput';
-import { ThemedText } from '../../components/ThemedText';
+import { ThemedScreen } from '../../components/ThemedScreen';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -44,13 +43,14 @@ export default function Login() {
   };
 
   return (
-    <>
-      <ThemedText variant="headlineMedium" style={styles.title}>
+    <ThemedScreen>
+      <Text variant="headlineMedium" style={styles.title}>
         Log In
-      </ThemedText>
+      </Text>
 
-      <ThemedInput
+      <TextInput
         label="Email"
+        mode="outlined"
         placeholder="Enter your email"
         value={email}
         onChangeText={setEmail}
@@ -59,8 +59,9 @@ export default function Login() {
         style={styles.input}
       />
 
-      <ThemedInput
+      <TextInput
         label="Password"
+        mode="outlined"
         placeholder="Enter your password"
         value={password}
         onChangeText={setPassword}
@@ -74,14 +75,14 @@ export default function Login() {
         style={styles.button}
       >
           Log In
-        </Button>
+      </Button>
 
       <Link href="/auth/signup">
-        <ThemedText style={styles.linkText}>Don't have an account? Sign Up</ThemedText>
+        <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
       </Link>
 
-      <Divider bold={true} style={styles.devider} theme={{ colors: { outlineVariant: colors.primary } }}/>
-      <ThemedText style={styles.deviderText}>Or</ThemedText>
+      <Divider bold={true} style={styles.devider}/>
+      <Text style={styles.deviderText}>or</Text>
 
       <Button
         mode="outlined"
@@ -93,13 +94,14 @@ export default function Login() {
 
       <Snackbar
         visible={snackbarVisible}
+        style={{ backgroundColor: colors.surfaceContainer }}
         onDismiss={() => setSnackbarVisible(false)}
         duration={3000}
         action={{ label: 'Close', onPress: () => setSnackbarVisible(false) }}
       >
-        <ThemedText>{String(snackbarMessage ?? '')}</ThemedText>
+        <Text>{String(snackbarMessage ?? '')}</Text>
       </Snackbar>
-    </>
+    </ThemedScreen>
   );
 }
 

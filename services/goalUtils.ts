@@ -23,7 +23,7 @@ export const shouldAutoFailGoal = (goal: Goal): boolean => {
  * Validates if a user can create a new goal.
  */
 export const canCreateNewGoal = (goals: Goal[]): boolean => {
-    const unpaidGoals = goals.filter(g => g.paymentStatus === 'pending');
+    const unpaidGoals = goals.filter(g => g.status === 'failed' && g.paymentStatus === 'pending');
     const activeGoals = goals.filter(g => g.status === 'active');
     
     const maxOngoingGoals = 5;

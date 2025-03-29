@@ -4,10 +4,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useGoals } from '../../store/GoalProvider';
 import { getClientSecret, processPayment } from '../../services/paymentService';
 import { useStripe } from '@stripe/stripe-react-native';
-import { ThemedText } from '../../components/ThemedText';
-import { ThemedButton } from '../../components/ThemedButton';
-import { ThemedCard } from '../../components/ThemedCard';
-import { useTheme } from 'react-native-paper';
+import { ThemedScreen } from '../../components/ThemedScreen';
+import { Text, Button, Card, useTheme } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
 
 export default function PaymentsScreen() {
@@ -68,71 +66,76 @@ export default function PaymentsScreen() {
 
   if (goalsLoading) {
     return (
-      <View style={styles.centered}>
+      <ThemedScreen>
         <ActivityIndicator size="large" color="#1E3A8A" />
-        <ThemedText style={styles.loadingText}>Loading goal...</ThemedText>
-      </View>
+        <Text style={styles.loadingText}>Loading goal...</Text>
+      </ThemedScreen>
     );
   }
 
   if (!goal) {
     return (
-      <View style={styles.centered}>
-        <ThemedText style={styles.errorText}>Goal not found or already paid.</ThemedText>
-        <ThemedButton onPress={() => router.replace('/')}>Back to Home</ThemedButton>
-      </View>
+      <ThemedScreen>
+        <Text style={styles.errorText}>Goal not found or already paid.</Text>
+        <Button onPress={() => router.replace('/')}>Back to Home</Button>
+      </ThemedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <ThemedCard style={styles.card}>
-        {paymentSuccess ? (
-          <LottieView
-            source={require('../../assets/animations/payment-success.json')}
-            autoPlay
-            loop={false}
-            style={{ height: 120 }}
-          />
-        ) : (
-          <>
-            <ThemedText variant="titleMedium" style={styles.title}>Settle Commitment</ThemedText>
-            <ThemedText style={styles.subtitle}>{goal.title}</ThemedText>
-            <ThemedText style={styles.amount}>Amount Due: ${goal.commitmentAmount}</ThemedText>
+    <ThemedScreen>
+      <Card style={{ backgroundColor: colors.surfaceContainer }}>
+        <Card.Content>
+          {paymentSuccess ? (
+            <LottieView
+              source={require('../../assets/animations/payment-success.json')}
+              autoPlay
+              loop={false}
+              style={{ height: 120 }}
+            />
+          ) : (
+            <>
+              <Text variant="titleMedium" style={styles.title}>Settle Commitment</Text>
+              <Text style={styles.subtitle}>{goal.title}</Text>
+              <Text style={styles.amount}>Amount Due: ${goal.commitmentAmount}</Text>
 
-            {paymentErrorMessage && (
-              <ThemedText style={styles.errorText}>{paymentErrorMessage}</ThemedText>
-            )}
+              {paymentErrorMessage && (
+                <Text style={styles.errorText}>{paymentErrorMessage}</Text>
+              )}
 
-            {clientSecret === null ? (
-              <ActivityIndicator size="large" color="#1E3A8A" />
-            ) : paymentLoading ? (
-              <ActivityIndicator size="large" color="#4CAF50" />
-            ) : (
-              <>
-                <ThemedButton
-                  textColor={colors.secondary}
-                  theme={{ colors: { outline: colors.secondary } }}
-                  onPress={handlePayment}
-                >
-                  Settle Up
-                </ThemedButton>
-                <ThemedButton onPress={() => router.replace('/')} style={styles.backButton}>
-                  Back to Home
-                </ThemedButton>
-              </>
-            )}
-          </>
-        )}
-      </ThemedCard>
-    </View>
+              {clientSecret === null ? (
+                <ActivityIndicator size="large" color="#1E3A8A" />
+              ) : paymentLoading ? (
+                <ActivityIndicator size="large" color="#4CAF50" />
+              ) : (
+                <>
+                  <Button
+                    mode="contained"
+                    theme={{ colors: { outline: colors.secondary } }}
+                    onPress={handlePayment}
+                  >
+                    Settle Up
+                  </Button>
+                  <Button
+                    onPress={() => router.replace('/')}
+                    textColor={colors.secondary}
+                    style={styles.backButton}
+                  >
+                    Back to Home
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+        </Card.Content>
+      </Card>
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  card: { padding: 20 },
   title: { textAlign: 'center', marginBottom: 10 },
   subtitle: { textAlign: 'center', marginBottom: 10 },
   amount: { textAlign: 'center', marginBottom: 10 },
